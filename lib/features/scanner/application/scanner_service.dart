@@ -4,10 +4,9 @@ import 'package:workkit/features/scanner/domain/document_scanner.dart';
 
 class ScannerService {
   const ScannerService({
-    required DocumentScanner scanner,
-    required DocumentLibraryService library,
-  })  : _scanner = scanner,
-        _library = library;
+    required this._scanner,
+    required this._library,
+  });
 
   final DocumentScanner _scanner;
   final DocumentLibraryService _library;
