@@ -11,7 +11,7 @@ class ToolsScreen extends StatelessWidget {
         title: 'Document',
         tools: <_ToolItem>[
           _ToolItem('Scan document', Icons.document_scanner_outlined, '/tools/scanner'),
-          _ToolItem('OCR', Icons.text_snippet_outlined, null),
+          _ToolItem('OCR', Icons.text_snippet_outlined, '/tools/ocr'),
           _ToolItem('Image to PDF', Icons.picture_as_pdf_outlined, null),
         ],
       ),
