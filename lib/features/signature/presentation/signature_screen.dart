@@ -61,7 +61,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
     final AsyncValue<List<WorkDocument>> documentsAsync = ref.watch(documentsProvider);
     final AsyncValue<List<SavedSignature>> signaturesAsync = ref.watch(signaturesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Signature')), 
+      appBar: AppBar(title: const Text('Signature')),
       body: documentsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => const Center(child: Text('Unable to load documents.')),
@@ -129,30 +129,37 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
           const Text('No saved signature yet.')
         else
           ...signatures.map(
-            (signature) => RadioListTile<String>(
-              value: signature.id,
-              groupValue: _selectedSignatureId,
-              onChanged: _busy ? null : (value) => setState(() => _selectedSignatureId = value),
-              title: Text(signature.name),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    height: 56,
-                    width: 160,
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(4),
-                    child: Image.file(File(signature.path), fit: BoxFit.contain),
+            (signature) {
+              final bool selected = _selectedSignatureId == signature.id;
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                selected: selected,
+                onTap: _busy ? null : () => setState(() => _selectedSignatureId = signature.id),
+                leading: Icon(
+                  selected ? Icons.check_circle : Icons.circle_outlined,
+                  color: selected ? Theme.of(context).colorScheme.primary : null,
+                ),
+                title: Text(signature.name),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      height: 56,
+                      width: 160,
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(4),
+                      child: Image.file(File(signature.path), fit: BoxFit.contain),
+                    ),
                   ),
                 ),
-              ),
-              secondary: IconButton(
-                tooltip: 'Delete signature',
-                onPressed: _busy ? null : () => _deleteSignature(signature),
-                icon: const Icon(Icons.delete_outline),
-              ),
-            ),
+                trailing: IconButton(
+                  tooltip: 'Delete signature',
+                  onPressed: _busy ? null : () => _deleteSignature(signature),
+                  icon: const Icon(Icons.delete_outline),
+                ),
+              );
+            },
           ),
         const Divider(height: 40),
         Text('Place on PDF', style: Theme.of(context).textTheme.headlineSmall),
