@@ -19,7 +19,7 @@ Status: Complete
 
 ## M1 — Document Library
 
-Status: In review
+Status: Complete
 
 - [x] Import files from device
 - [x] Copy imports into WorkKit-managed local storage
@@ -36,26 +36,30 @@ Status: In review
 
 ## Platform bootstrap before M2
 
-- [ ] Generate and commit Android platform folder
-- [ ] Generate and commit iOS platform folder
-- [ ] Add Android debug build to CI
-- [ ] Verify file picker/share plugins on a real Android device
+- [x] Reproducible Android platform generation
+- [x] Reproducible iOS platform generation
+- [x] iOS deployment target and camera permission patching
+- [x] Android debug build in CI
+- [ ] Physical Android smoke test
 
 ## M2 — Scanner
 
-- [ ] Android ML Kit document scanner adapter
-- [ ] iOS VisionKit adapter
-- [ ] Multi-page scan
-- [ ] Crop/rotate/filter flow
-- [ ] Save scan as image/PDF
-- [ ] Cancellation and permission states
-- [ ] Device integration tests
+Status: In review
+
+- [x] Android ML Kit document scanner adapter
+- [x] iOS VisionKit adapter
+- [x] Multi-page scan
+- [x] Native crop/rotate/filter/enhancement flow
+- [x] Save scan as image/PDF
+- [x] Cancellation/error states
+- [x] Application lifecycle tests
+- [ ] Physical-device integration smoke test
 
 ## M3 — OCR
 
 - [ ] OCR service interface
 - [ ] Android ML Kit implementation
-- [ ] iOS Vision implementation
+- [ ] iOS ML Kit/Vision implementation
 - [ ] Image/PDF OCR pipeline
 - [ ] Editable extracted text
 - [ ] Smart extraction for phone/email/date/URL/money

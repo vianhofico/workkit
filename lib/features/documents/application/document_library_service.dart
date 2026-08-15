@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_initializing_formals
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:workkit/core/storage/local_file_service.dart';
@@ -25,21 +26,32 @@ class DocumentLibraryService {
     if (picked == null) {
       return null;
     }
+    return importPath(sourcePath: picked.path, displayName: picked.name);
+  }
 
+  Future<WorkDocument> importPath({
+    required String sourcePath,
+    required String displayName,
+  }) async {
     final DateTime now = DateTime.now();
     final String id = _createId(now);
-    final String extension = _extensionOf(picked.name);
+    final String normalizedName = displayName.trim().isEmpty
+        ? _fileNameFromPath(sourcePath)
+        : displayName.trim();
+    final String extension = _extensionOf(normalizedName.isEmpty
+        ? _fileNameFromPath(sourcePath)
+        : normalizedName);
     final String storageName = extension.isEmpty ? id : '$id.$extension';
 
-    final importedFile = await _storage.copyIntoStorage(
-      sourcePath: picked.path,
+    final File importedFile = await _storage.copyIntoStorage(
+      sourcePath: sourcePath,
       directory: 'documents',
       fileName: storageName,
     );
 
     final WorkDocument document = WorkDocument(
       id: id,
-      name: picked.name.trim().isEmpty ? 'Untitled document' : picked.name.trim(),
+      name: normalizedName.isEmpty ? 'Untitled document' : normalizedName,
       type: _typeForExtension(extension),
       path: importedFile.path,
       sizeBytes: await importedFile.length(),
@@ -73,6 +85,11 @@ class DocumentLibraryService {
   String _createId(DateTime now) {
     final int random = Random.secure().nextInt(0x7fffffff);
     return '${now.microsecondsSinceEpoch.toRadixString(36)}-${random.toRadixString(36)}';
+  }
+
+  String _fileNameFromPath(String path) {
+    final String normalized = path.replaceAll('\\', '/');
+    return normalized.split('/').last;
   }
 
   String _extensionOf(String fileName) {
