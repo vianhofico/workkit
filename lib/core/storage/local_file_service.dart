@@ -53,7 +53,7 @@ class LocalFileService {
       if (await targetFile.exists()) {
         await targetFile.delete();
       }
-      return tempFile.rename(targetPath);
+      return await tempFile.rename(targetPath);
     } on FileSystemException catch (error) {
       final File tempFile = File(tempPath);
       if (await tempFile.exists()) {
