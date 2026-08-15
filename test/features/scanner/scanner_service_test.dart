@@ -44,10 +44,11 @@ void main() {
         await service.scanAndSave(ScanOutputFormat.images);
 
     expect(saved, isNotNull);
-    expect(saved, hasLength(2));
+    final List<WorkDocument> savedDocuments = saved!;
+    expect(savedDocuments, hasLength(2));
     expect(repository.documents, hasLength(2));
-    expect(await File(saved!.first.path).exists(), isTrue);
-    expect(saved.first.type, 'image');
+    expect(await File(savedDocuments.first.path).exists(), isTrue);
+    expect(savedDocuments.first.type, 'image');
   });
 
   test('cancelled native scan creates no managed documents', () async {
@@ -122,5 +123,6 @@ class _MemoryDocumentRepository implements DocumentRepository {
   Future<void> setFavorite(String id, {required bool isFavorite}) async {}
 
   @override
-  Stream<List<WorkDocument>> watchAll() => Stream<List<WorkDocument>>.value(documents);
+  Stream<List<WorkDocument>> watchAll() =>
+      Stream<List<WorkDocument>>.value(documents);
 }
