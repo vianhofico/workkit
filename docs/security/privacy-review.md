@@ -14,6 +14,7 @@ WorkKit stores imported/generated documents, OCR text, signatures, QR history, s
 - Long-running operations use a local job journal so app termination can be reported as interrupted instead of silently appearing complete.
 - Restore only accepts the WorkKit backup magic/version, bounds manifest size, validates file lengths, rejects unsafe relative paths, and stages payloads before database replacement.
 - Backup files intentionally remain user-portable and are **not encrypted**. The UI warns users to store them securely. Device/platform encryption and the destination chosen through the share sheet are outside WorkKit's backup format.
+- Android platform bootstrap disables application backup/device-transfer data extraction for WorkKit-managed local data and rejects cleartext network traffic. This prevents OS backup from silently becoming a cloud-sync mechanism for the app's managed files.
 - The release workflow reads Android signing credentials only from GitHub Secrets/environment variables and does not commit a keystore or password.
 
 ## Re-review triggers
