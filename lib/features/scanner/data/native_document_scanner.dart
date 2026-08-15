@@ -10,7 +10,7 @@ class NativeDocumentScanner implements DocumentScanner {
     try {
       final List<String>? paths = format == ScanOutputFormat.pdf
           ? await native.DocumentScanner.scan(
-              format: native.DocumentScannerFormat.pdf,
+              format: native.DocScanFormat.pdf,
             )
           : await native.DocumentScanner.scan();
 
