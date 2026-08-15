@@ -18,7 +18,10 @@ void main() {
 
   test('rejects empty QR content', () async {
     final QrService service = QrService(_MemoryQrRepository());
-    expect(() => service.recordGenerated('   '), throwsA(isA<FormatException>()));
+    await expectLater(
+      service.recordGenerated('   '),
+      throwsA(isA<FormatException>()),
+    );
   });
 }
 

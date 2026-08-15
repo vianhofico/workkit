@@ -11,8 +11,8 @@ class DriftQrHistoryRepository implements QrHistoryRepository {
   @override
   Stream<List<QrHistoryEntry>> watchAll() {
     final query = database.select(database.qrHistory)
-      ..orderBy(<OrderClauseGenerator<$QrHistoryTable>>[
-        (table) => OrderingTerm.desc(table.createdAt),
+      ..orderBy([
+        (row) => OrderingTerm.desc(row.createdAt),
       ]);
     return query.watch().map(
           (rows) => rows

@@ -21,7 +21,7 @@ class ToolsScreen extends StatelessWidget {
           _ToolItem('Merge / split', Icons.merge_type, '/tools/pdf'),
           _ToolItem('Reorder / delete', Icons.reorder, '/tools/pdf'),
           _ToolItem('Rotate / export images', Icons.rotate_right, '/tools/pdf'),
-          _ToolItem('Sign', Icons.draw_outlined, null),
+          _ToolItem('Sign', Icons.draw_outlined, '/tools/signature'),
         ],
       ),
       _ToolSection(
@@ -35,8 +35,8 @@ class ToolsScreen extends StatelessWidget {
       _ToolSection(
         title: 'QR',
         tools: <_ToolItem>[
-          _ToolItem('Scan QR', Icons.qr_code_scanner, null),
-          _ToolItem('Create QR', Icons.qr_code_2, null),
+          _ToolItem('Scan QR', Icons.qr_code_scanner, '/tools/qr'),
+          _ToolItem('Create QR', Icons.qr_code_2, '/tools/qr'),
         ],
       ),
     ];

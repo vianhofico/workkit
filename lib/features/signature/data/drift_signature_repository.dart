@@ -11,8 +11,8 @@ class DriftSignatureRepository implements SignatureRepository {
   @override
   Stream<List<SavedSignature>> watchAll() {
     final query = database.select(database.signatures)
-      ..orderBy(<OrderClauseGenerator<$SignaturesTable>>[
-        (table) => OrderingTerm.desc(table.createdAt),
+      ..orderBy([
+        (row) => OrderingTerm.desc(row.createdAt),
       ]);
     return query.watch().map(
           (rows) => rows

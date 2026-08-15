@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-M4 — PDF Toolkit
+M5 — Signature and QR
 
 ## Completed
 
@@ -10,21 +10,18 @@ M4 — PDF Toolkit
 - M1 Document Library
 - M2 Native Scanner + Android/iOS bootstrap
 - M3 On-device OCR + smart extraction
+- M4 Streaming PDF Toolkit
 
-## M4 — implemented in current branch
+## M5 — implemented in current branch
 
-- Image to PDF
-- Merge PDFs
-- Split every N pages
-- Delete selected pages
-- Reorder pages
-- Rotate selected pages
-- PDF to PNG pages
-- Password-required and wrong-password handling with typed PDF errors
-- Streaming file I/O for large inputs/outputs
-- Managed-copy persistence and temp cleanup
-- Gradle cache in CI
+- Draw and save reusable transparent PNG signatures locally
+- Place signatures on PDF pages with position, size and rotation controls
+- Password-protected PDF handling for signing
+- On-device QR camera scanning
+- Local QR generation
+- Persistent local QR history with clear action
+- Unit and Drift repository coverage
 
 ## Next code task
 
-Get M4 CI green, merge it, then implement M5 Signature and QR.
+Get M5 CI green, merge it, then implement M6 Image Toolkit.

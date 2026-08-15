@@ -29,7 +29,7 @@ Status: Complete
 - [x] Smart extraction and Vietnamese/English fixtures
 
 ## M4 — PDF Toolkit
-Status: In review
+Status: Complete
 - [x] Image to PDF
 - [x] Merge
 - [x] Split
@@ -41,11 +41,12 @@ Status: In review
 - [x] Large-file streaming strategy
 
 ## M5 — Signature and QR
-- [ ] Draw/save signatures locally
-- [ ] Place/resize/rotate signature on PDF
-- [ ] QR scan
-- [ ] QR generation
-- [ ] QR history
+Status: In review
+- [x] Draw/save signatures locally
+- [x] Place/resize/rotate signature on PDF
+- [x] QR scan
+- [x] QR generation
+- [x] QR history
 
 ## M6 — Image Toolkit
 - [ ] Compress
