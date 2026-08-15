@@ -1,0 +1,75 @@
+name: Android Release AAB
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Bootstrap Android and iOS projects
+        run: dart run tool/bootstrap_platforms.dart
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate Drift code
+        run: dart run build_runner build
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Validate Android signing secrets
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          ANDROID_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          test -n "$ANDROID_UPLOAD_KEYSTORE_BASE64" || (echo "::error::ANDROID_UPLOAD_KEYSTORE_BASE64 is missing" && exit 1)
+          test -n "$ANDROID_UPLOAD_STORE_PASSWORD" || (echo "::error::ANDROID_UPLOAD_STORE_PASSWORD is missing" && exit 1)
+          test -n "$ANDROID_UPLOAD_KEY_ALIAS" || (echo "::error::ANDROID_UPLOAD_KEY_ALIAS is missing" && exit 1)
+          test -n "$ANDROID_UPLOAD_KEY_PASSWORD" || (echo "::error::ANDROID_UPLOAD_KEY_PASSWORD is missing" && exit 1)
+
+      - name: Configure Android release signing
+        env:
+          ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          WORKKIT_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          WORKKIT_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          WORKKIT_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$ANDROID_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/workkit-upload.jks"
+          echo "WORKKIT_KEYSTORE_PATH=$RUNNER_TEMP/workkit-upload.jks" >> "$GITHUB_ENV"
+          dart run tool/configure_android_signing.dart
+
+      - name: Build signed release AAB
+        env:
+          WORKKIT_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          WORKKIT_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          WORKKIT_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: flutter build appbundle --release
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: workkit-android-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14

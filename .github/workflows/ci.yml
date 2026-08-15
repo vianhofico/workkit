@@ -11,7 +11,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
       - name: Checkout
@@ -53,3 +53,6 @@ jobs:
 
       - name: Build Android debug APK
         run: flutter build apk --debug
+
+      - name: Build Android release AAB
+        run: flutter build appbundle --release

@@ -10,17 +10,18 @@ Status: Complete
 - [x] Rename/delete/share, previews, storage usage and lifecycle tests
 
 ## Platform bootstrap
+Status: Code complete; physical validation pending
 - [x] Reproducible Android/iOS generation
 - [x] iOS deployment target and camera permission
 - [x] Android debug APK build in CI
-- [ ] Physical Android smoke test
+- [ ] Physical Android smoke test — external validation
 
 ## M2 — Scanner
-Status: Complete
+Status: Code complete; physical validation pending
 - [x] Android ML Kit / iOS VisionKit native scanner
 - [x] Multi-page scan and native crop/rotate/enhancement
 - [x] Save as images/PDF, cancellation/error handling and service tests
-- [ ] Physical-device integration smoke test
+- [ ] Physical-device integration smoke test — external validation
 
 ## M3 — OCR
 Status: Complete
@@ -49,7 +50,7 @@ Status: Complete
 - [x] QR history
 
 ## M6 — Image Toolkit
-Status: In review
+Status: Complete
 - [x] Compress
 - [x] Resize
 - [x] Crop
@@ -57,11 +58,14 @@ Status: In review
 - [x] Metadata removal
 
 ## M7 — Production Hardening
-- [ ] Accessibility pass
-- [ ] Low-storage recovery
-- [ ] App-killed recovery for long jobs
-- [ ] Backup/restore
-- [ ] Security/privacy review
-- [ ] Performance profiling
-- [ ] Android AAB release workflow
-- [ ] Play Store internal testing
+Status: Code complete; external release validation pending
+- [x] Accessibility pass + 200% text regression gate
+- [x] Low-storage recovery and abandoned-temp cleanup
+- [x] App-killed recovery journal for long jobs
+- [x] Streaming local backup/restore
+- [x] Security/privacy review
+- [x] CI performance regression profiling + physical profile checklist
+- [x] Android release AAB build and signed-AAB workflow
+- [ ] Play Store internal testing — external Play Console validation
+
+See `docs/project/external-validation.md` for the remaining hardware/account-bound checks.
