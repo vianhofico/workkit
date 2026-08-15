@@ -12,15 +12,15 @@ class ToolsScreen extends StatelessWidget {
         tools: <_ToolItem>[
           _ToolItem('Scan document', Icons.document_scanner_outlined, '/tools/scanner'),
           _ToolItem('OCR', Icons.text_snippet_outlined, '/tools/ocr'),
-          _ToolItem('Image to PDF', Icons.picture_as_pdf_outlined, null),
+          _ToolItem('Image to PDF', Icons.picture_as_pdf_outlined, '/tools/pdf'),
         ],
       ),
       _ToolSection(
         title: 'PDF',
         tools: <_ToolItem>[
-          _ToolItem('Merge', Icons.merge_type, null),
-          _ToolItem('Split', Icons.call_split, null),
-          _ToolItem('Reorder', Icons.reorder, null),
+          _ToolItem('Merge / split', Icons.merge_type, '/tools/pdf'),
+          _ToolItem('Reorder / delete', Icons.reorder, '/tools/pdf'),
+          _ToolItem('Rotate / export images', Icons.rotate_right, '/tools/pdf'),
           _ToolItem('Sign', Icons.draw_outlined, null),
         ],
       ),
@@ -78,14 +78,12 @@ class ToolsScreen extends StatelessWidget {
 
 class _ToolSection {
   const _ToolSection({required this.title, required this.tools});
-
   final String title;
   final List<_ToolItem> tools;
 }
 
 class _ToolItem {
   const _ToolItem(this.label, this.icon, this.route);
-
   final String label;
   final IconData icon;
   final String? route;

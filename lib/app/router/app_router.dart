@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:workkit/features/files/presentation/files_screen.dart';
 import 'package:workkit/features/home/presentation/home_screen.dart';
 import 'package:workkit/features/ocr/presentation/ocr_screen.dart';
+import 'package:workkit/features/pdf/presentation/pdf_toolkit_screen.dart';
 import 'package:workkit/features/scanner/presentation/scanner_screen.dart';
 import 'package:workkit/features/settings/presentation/settings_screen.dart';
 import 'package:workkit/features/shell/presentation/app_shell.dart';
@@ -19,15 +20,8 @@ final GoRouter appRouter = GoRouter(
         GoRoute(path: '/settings', name: 'settings', builder: (context, state) => const SettingsScreen()),
       ],
     ),
-    GoRoute(
-      path: '/tools/scanner',
-      name: 'scanner',
-      builder: (context, state) => const ScannerScreen(),
-    ),
-    GoRoute(
-      path: '/tools/ocr',
-      name: 'ocr',
-      builder: (context, state) => const OcrScreen(),
-    ),
+    GoRoute(path: '/tools/scanner', name: 'scanner', builder: (context, state) => const ScannerScreen()),
+    GoRoute(path: '/tools/ocr', name: 'ocr', builder: (context, state) => const OcrScreen()),
+    GoRoute(path: '/tools/pdf', name: 'pdf', builder: (context, state) => const PdfToolkitScreen()),
   ],
 );
