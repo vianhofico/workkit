@@ -23,24 +23,22 @@ Status: Complete
 - [ ] Physical-device integration smoke test
 
 ## M3 — OCR
-Status: In review
-- [x] OCR service interface
+Status: Complete
 - [x] Android/iOS ML Kit Latin implementation
-- [x] Image/PDF OCR pipeline
-- [x] Editable extracted text persisted locally
-- [x] Smart extraction for phone/email/date/URL/money
-- [x] Vietnamese and English fixture suite
+- [x] Image/PDF OCR pipeline and editable local text
+- [x] Smart extraction and Vietnamese/English fixtures
 
 ## M4 — PDF Toolkit
-- [ ] Image to PDF
-- [ ] Merge
-- [ ] Split
-- [ ] Reorder
-- [ ] Rotate
-- [ ] Delete pages
-- [ ] PDF to images
-- [ ] Password/encrypted-file handling
-- [ ] Large-file streaming strategy
+Status: In review
+- [x] Image to PDF
+- [x] Merge
+- [x] Split
+- [x] Reorder
+- [x] Rotate
+- [x] Delete pages
+- [x] PDF to images
+- [x] Password/encrypted-file handling
+- [x] Large-file streaming strategy
 
 ## M5 — Signature and QR
 - [ ] Draw/save signatures locally

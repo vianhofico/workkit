@@ -2,29 +2,29 @@
 
 ## Current milestone
 
-M3 — OCR
+M4 — PDF Toolkit
 
 ## Completed
 
-### M0 — Foundation
-Flutter shell, Material 3, Riverpod, go_router, Drift, safe local files, tests and CI.
+- M0 Foundation
+- M1 Document Library
+- M2 Native Scanner + Android/iOS bootstrap
+- M3 On-device OCR + smart extraction
 
-### M1 — Document Library
-Managed import/storage, metadata, recent/search/favorites, rename/delete/share, image preview and storage reporting.
+## M4 — implemented in current branch
 
-### M2 — Scanner
-Android ML Kit / iOS VisionKit scanner, multi-page image/PDF output, native crop/enhancement, platform bootstrap and green Android APK CI build.
-
-## M3 — implemented in current branch
-
-- Latin on-device OCR adapter with ML Kit Text Recognition
-- Image OCR
-- PDF page rendering with pdf_manipulator followed by ML Kit OCR
-- Editable OCR text stored in Drift `OcrResults`
-- Smart extraction for email, phone, date, URL and money values
-- Vietnamese and English deterministic fixture tests
-- OCR route integrated into Tools
+- Image to PDF
+- Merge PDFs
+- Split every N pages
+- Delete selected pages
+- Reorder pages
+- Rotate selected pages
+- PDF to PNG pages
+- Password-required and wrong-password handling with typed PDF errors
+- Streaming file I/O for large inputs/outputs
+- Managed-copy persistence and temp cleanup
+- Gradle cache in CI
 
 ## Next code task
 
-Get M3 CI green, merge it, then implement M4 PDF Toolkit on the same streaming PDF engine.
+Get M4 CI green, merge it, then implement M5 Signature and QR.
