@@ -22,6 +22,15 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Tools'), findsOneWidget);
     expect(find.text('Scan document'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Create QR'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
     expect(find.text('Create QR'), findsOneWidget);
   });
 }
