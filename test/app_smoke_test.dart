@@ -8,9 +8,9 @@ void main() {
   testWidgets('shows WorkKit home foundation', (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: <Override>[
+        overrides: [
           documentsProvider.overrideWith(
-            (Ref ref) => Stream<List<WorkDocument>>.value(
+            (ref) => Stream<List<WorkDocument>>.value(
               const <WorkDocument>[],
             ),
           ),
