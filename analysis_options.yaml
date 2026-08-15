@@ -7,3 +7,4 @@ analyzer:
 linter:
   rules:
     avoid_print: true
+    use_super_parameters: false
