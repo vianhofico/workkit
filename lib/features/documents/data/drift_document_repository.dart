@@ -11,7 +11,10 @@ class DriftDocumentRepository implements DocumentRepository {
   @override
   Stream<List<WorkDocument>> watchAll() {
     final query = _database.select(_database.documents)
-      ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)]);
+      ..orderBy([
+        (row) => OrderingTerm.desc(row.updatedAt),
+      ]);
+
     return query.watch().map(
           (rows) => rows.map(_toDomain).toList(growable: false),
         );
@@ -20,37 +23,89 @@ class DriftDocumentRepository implements DocumentRepository {
   @override
   Future<List<WorkDocument>> getRecent({int limit = 10}) async {
     final query = _database.select(_database.documents)
-      ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)])
+      ..orderBy([
+        (row) => OrderingTerm.desc(row.updatedAt),
+      ])
       ..limit(limit);
-    final rows = await query.get();
+
+    final List<Document> rows = await query.get();
     return rows.map(_toDomain).toList(growable: false);
   }
 
   @override
-  Future<void> deleteById(String id) async {
-    await (_database.delete(_database.documents)..where((row) => row.id.equals(id))).go();
+  Future<WorkDocument?> getById(String id) async {
+    final query = _database.select(_database.documents)
+      ..where((row) => row.id.equals(id));
+    final Document? row = await query.getSingleOrNull();
+    return row == null ? null : _toDomain(row);
   }
 
   @override
-  Future<void> setFavorite(String id, {required bool isFavorite}) async {
-    await (_database.update(_database.documents)..where((row) => row.id.equals(id))).write(
+  Future<void> add(WorkDocument document) async {
+    await _database.into(_database.documents).insert(
+          DocumentsCompanion.insert(
+            id: document.id,
+            name: document.name,
+            type: document.type,
+            path: document.path,
+            thumbnailPath: Value<String?>(document.thumbnailPath),
+            sizeBytes: Value<int>(document.sizeBytes),
+            pageCount: Value<int?>(document.pageCount),
+            isFavorite: Value<bool>(document.isFavorite),
+            createdAt: Value<DateTime>(document.createdAt),
+            updatedAt: Value<DateTime>(document.updatedAt),
+          ),
+        );
+  }
+
+  @override
+  Future<void> rename(String id, String name) async {
+    final String normalizedName = name.trim();
+    if (normalizedName.isEmpty) {
+      throw const FormatException('Document name cannot be empty.');
+    }
+
+    await (_database.update(_database.documents)
+          ..where((row) => row.id.equals(id)))
+        .write(
       DocumentsCompanion(
-        isFavorite: Value(isFavorite),
-        updatedAt: Value(DateTime.now()),
+        name: Value<String>(normalizedName),
+        updatedAt: Value<DateTime>(DateTime.now()),
       ),
     );
   }
 
-  WorkDocument _toDomain(Document row) => WorkDocument(
-        id: row.id,
-        name: row.name,
-        type: row.type,
-        path: row.path,
-        thumbnailPath: row.thumbnailPath,
-        sizeBytes: row.sizeBytes,
-        pageCount: row.pageCount,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-        isFavorite: row.isFavorite,
-      );
+  @override
+  Future<void> deleteById(String id) async {
+    await (_database.delete(_database.documents)
+          ..where((row) => row.id.equals(id)))
+        .go();
+  }
+
+  @override
+  Future<void> setFavorite(String id, {required bool isFavorite}) async {
+    await (_database.update(_database.documents)
+          ..where((row) => row.id.equals(id)))
+        .write(
+      DocumentsCompanion(
+        isFavorite: Value<bool>(isFavorite),
+        updatedAt: Value<DateTime>(DateTime.now()),
+      ),
+    );
+  }
+
+  WorkDocument _toDomain(Document row) {
+    return WorkDocument(
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      path: row.path,
+      thumbnailPath: row.thumbnailPath,
+      sizeBytes: row.sizeBytes,
+      pageCount: row.pageCount,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      isFavorite: row.isFavorite,
+    );
+  }
 }
