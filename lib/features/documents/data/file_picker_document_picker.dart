@@ -7,16 +7,12 @@ class FilePickerDocumentPicker implements DocumentPicker {
 
   @override
   Future<PickedDocument?> pick() async {
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      withData: false,
-    );
+    final PlatformFile? file = await FilePicker.pickFile();
 
-    if (result == null || result.files.isEmpty) {
+    if (file == null) {
       return null;
     }
 
-    final PlatformFile file = result.files.single;
     final String? path = file.path;
     if (path == null || path.trim().isEmpty) {
       throw const StorageFailure(
