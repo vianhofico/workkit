@@ -45,7 +45,7 @@ Future<void> _patchIos() async {
     const String permissionBlock = '''flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
-        '$(inherited)',
+        '\$(inherited)',
         'PERMISSION_CAMERA=1',
       ]
     end''';
