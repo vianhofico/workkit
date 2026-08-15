@@ -1,72 +1,37 @@
 # Implementation Plan
 
 ## M0 — Foundation
-
 Status: Complete
-
-- [x] Product scope and architecture decisions
-- [x] Flutter application shell
-- [x] Material 3 light/dark theme
-- [x] go_router navigation shell
-- [x] Riverpod foundation
-- [x] Drift schema v1
-- [x] Local safe-file service
-- [x] Universal action contract
-- [x] Document repository abstraction and Drift implementation
-- [x] Unit/widget test foundation
-- [x] GitHub Actions quality workflow
-- [x] First green CI on GitHub
+- [x] Flutter shell, theme, routing, Riverpod, Drift, local storage, tests and CI
 
 ## M1 — Document Library
-
 Status: Complete
+- [x] Import, managed storage, metadata, recent/search/favorites
+- [x] Rename/delete/share, previews, storage usage and lifecycle tests
 
-- [x] Import files from device
-- [x] Copy imports into WorkKit-managed local storage
-- [x] Persist document metadata
-- [x] Recent documents
-- [x] Search
-- [x] Favorites
-- [x] Rename
-- [x] Delete with confirmation
-- [x] Share/export
-- [x] Image preview thumbnails
-- [x] Storage usage reporting
-- [x] Repository/import lifecycle tests
-
-## Platform bootstrap before M2
-
-- [x] Reproducible Android platform generation
-- [x] Reproducible iOS platform generation
-- [x] iOS deployment target and camera permission patching
-- [x] Android debug build in CI
+## Platform bootstrap
+- [x] Reproducible Android/iOS generation
+- [x] iOS deployment target and camera permission
+- [x] Android debug APK build in CI
 - [ ] Physical Android smoke test
 
 ## M2 — Scanner
-
-Status: In review
-
-- [x] Android ML Kit document scanner adapter
-- [x] iOS VisionKit adapter
-- [x] Multi-page scan
-- [x] Native crop/rotate/filter/enhancement flow
-- [x] Save scan as image/PDF
-- [x] Cancellation/error states
-- [x] Application lifecycle tests
+Status: Complete
+- [x] Android ML Kit / iOS VisionKit native scanner
+- [x] Multi-page scan and native crop/rotate/enhancement
+- [x] Save as images/PDF, cancellation/error handling and service tests
 - [ ] Physical-device integration smoke test
 
 ## M3 — OCR
-
-- [ ] OCR service interface
-- [ ] Android ML Kit implementation
-- [ ] iOS ML Kit/Vision implementation
-- [ ] Image/PDF OCR pipeline
-- [ ] Editable extracted text
-- [ ] Smart extraction for phone/email/date/URL/money
-- [ ] Vietnamese and English fixture suite
+Status: In review
+- [x] OCR service interface
+- [x] Android/iOS ML Kit Latin implementation
+- [x] Image/PDF OCR pipeline
+- [x] Editable extracted text persisted locally
+- [x] Smart extraction for phone/email/date/URL/money
+- [x] Vietnamese and English fixture suite
 
 ## M4 — PDF Toolkit
-
 - [ ] Image to PDF
 - [ ] Merge
 - [ ] Split
@@ -78,7 +43,6 @@ Status: In review
 - [ ] Large-file streaming strategy
 
 ## M5 — Signature and QR
-
 - [ ] Draw/save signatures locally
 - [ ] Place/resize/rotate signature on PDF
 - [ ] QR scan
@@ -86,7 +50,6 @@ Status: In review
 - [ ] QR history
 
 ## M6 — Image Toolkit
-
 - [ ] Compress
 - [ ] Resize
 - [ ] Crop
@@ -94,7 +57,6 @@ Status: In review
 - [ ] Metadata removal
 
 ## M7 — Production Hardening
-
 - [ ] Accessibility pass
 - [ ] Low-storage recovery
 - [ ] App-killed recovery for long jobs
