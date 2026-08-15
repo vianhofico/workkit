@@ -27,9 +27,11 @@ class ToolsScreen extends StatelessWidget {
       _ToolSection(
         title: 'Image',
         tools: <_ToolItem>[
-          _ToolItem('Compress', Icons.compress, null),
-          _ToolItem('Resize', Icons.aspect_ratio, null),
-          _ToolItem('Convert', Icons.transform, null),
+          _ToolItem('Compress', Icons.compress, '/tools/image'),
+          _ToolItem('Resize', Icons.aspect_ratio, '/tools/image'),
+          _ToolItem('Crop', Icons.crop, '/tools/image'),
+          _ToolItem('Convert', Icons.transform, '/tools/image'),
+          _ToolItem('Remove metadata', Icons.privacy_tip_outlined, '/tools/image'),
         ],
       ),
       _ToolSection(
