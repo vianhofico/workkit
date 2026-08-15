@@ -165,7 +165,7 @@ class BackupService {
       if (await target.exists()) {
         await target.delete();
       }
-      return temp.rename(target.path);
+      return await temp.rename(target.path);
     } on FileSystemException catch (error) {
       throw StorageFailure(
         'Unable to create backup. Check available device storage and try again.',

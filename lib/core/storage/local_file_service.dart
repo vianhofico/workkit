@@ -197,7 +197,7 @@ class LocalFileService {
   Future<int> _entitySize(FileSystemEntity entity) async {
     try {
       if (entity is File) {
-        return entity.length();
+        return await entity.length();
       }
       if (entity is Directory) {
         int total = 0;
