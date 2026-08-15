@@ -20,10 +20,7 @@ class LocalFileService {
       await root.create(recursive: true);
       return LocalFileService._(root);
     } on FileSystemException catch (error) {
-      throw StorageFailure(
-        'Unable to initialize WorkKit storage.',
-        cause: error,
-      );
+      throw _failure('Unable to initialize WorkKit storage.', error);
     }
   }
 
@@ -38,7 +35,7 @@ class LocalFileService {
     try {
       return await directory.create(recursive: true);
     } on FileSystemException catch (error) {
-      throw StorageFailure('Unable to create local folder.', cause: error);
+      throw _failure('Unable to create local folder.', error);
     }
   }
 
@@ -58,7 +55,7 @@ class LocalFileService {
       return File(targetPath);
     } on FileSystemException catch (error) {
       await _deleteTempIfPresent(tempPath);
-      throw StorageFailure('Unable to save file safely.', cause: error);
+      throw _failure('Unable to save file safely.', error);
     }
   }
 
@@ -83,7 +80,7 @@ class LocalFileService {
       return File(targetPath);
     } on FileSystemException catch (error) {
       await _deleteTempIfPresent(tempPath);
-      throw StorageFailure('Unable to import the selected file.', cause: error);
+      throw _failure('Unable to import the selected file.', error);
     }
   }
 
@@ -94,8 +91,55 @@ class LocalFileService {
         await file.delete();
       }
     } on FileSystemException catch (error) {
-      throw StorageFailure('Unable to delete the local file.', cause: error);
+      throw _failure('Unable to delete the local file.', error);
     }
+  }
+
+  Future<int> recoverAbandonedFiles({bool includeRecent = false}) async {
+    int recovered = 0;
+    if (await _rootDirectory.exists()) {
+      await for (final FileSystemEntity entity
+          in _rootDirectory.list(recursive: true, followLinks: false)) {
+        if (entity is File && entity.path.endsWith('.workkit-tmp')) {
+          recovered += await _entitySize(entity);
+          try {
+            await entity.delete();
+          } on FileSystemException {
+            // Best-effort recovery: another operation may still own the file.
+          }
+        }
+      }
+    }
+
+    final Directory systemTemp = Directory.systemTemp;
+    if (!await systemTemp.exists()) {
+      return recovered;
+    }
+    await for (final FileSystemEntity entity
+        in systemTemp.list(followLinks: false)) {
+      final String name = entity.path.split(Platform.pathSeparator).last;
+      if (!_isWorkKitTempName(name)) {
+        continue;
+      }
+      if (!includeRecent) {
+        try {
+          final FileStat stat = await entity.stat();
+          if (DateTime.now().difference(stat.modified) <
+              const Duration(minutes: 30)) {
+            continue;
+          }
+        } on FileSystemException {
+          continue;
+        }
+      }
+      recovered += await _entitySize(entity);
+      try {
+        await entity.delete(recursive: true);
+      } on FileSystemException {
+        // Best-effort recovery: leave files that cannot be safely removed.
+      }
+    }
+    return recovered;
   }
 
   String _targetPath(Directory directory, String fileName) {
@@ -129,5 +173,51 @@ class LocalFileService {
     }
 
     return sanitized;
+  }
+
+  bool _isWorkKitTempName(String name) {
+    return name.startsWith('workkit_pdf_') ||
+        name.startsWith('workkit_image_') ||
+        name.startsWith('workkit_ocr_pdf_') ||
+        name.startsWith('workkit_signature_pdf_') ||
+        name.startsWith('workkit_restore_staging_');
+  }
+
+  Future<int> _entitySize(FileSystemEntity entity) async {
+    try {
+      if (entity is File) {
+        return entity.length();
+      }
+      if (entity is Directory) {
+        int total = 0;
+        await for (final FileSystemEntity child
+            in entity.list(recursive: true, followLinks: false)) {
+          if (child is File) {
+            total += await child.length();
+          }
+        }
+        return total;
+      }
+    } on FileSystemException {
+      return 0;
+    }
+    return 0;
+  }
+
+  static StorageFailure _failure(
+    String fallback,
+    FileSystemException error,
+  ) {
+    final String message = error.message.toLowerCase();
+    final bool noSpace = error.osError?.errorCode == 28 ||
+        message.contains('no space') ||
+        message.contains('disk full');
+    if (noSpace) {
+      return StorageFailure(
+        'Device storage is full. Free some space or use Settings > Recover storage, then try again.',
+        cause: error,
+      );
+    }
+    return StorageFailure(fallback, cause: error);
   }
 }

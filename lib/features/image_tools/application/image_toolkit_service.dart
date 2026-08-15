@@ -1,12 +1,18 @@
+import 'package:workkit/core/recovery/tool_job_tracker.dart';
 import 'package:workkit/features/documents/application/document_library_service.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 import 'package:workkit/features/image_tools/domain/image_toolkit_engine.dart';
 
 class ImageToolkitService {
-  const ImageToolkitService({required this.engine, required this.library});
+  const ImageToolkitService({
+    required this.engine,
+    required this.library,
+    this.jobs,
+  });
 
   final ImageToolkitEngine engine;
   final DocumentLibraryService library;
+  final ToolJobTracker? jobs;
 
   Future<WorkDocument> compress(WorkDocument document, {int quality = 80}) {
     return _persist(
@@ -82,15 +88,46 @@ class ImageToolkitService {
     if (source.type != 'image') {
       throw const FormatException('Choose an image file.');
     }
-    final ImageToolkitOutput output = await operation();
+    final String? jobId = await _startJob('image:${prefix.toLowerCase()}', source.path);
+    ImageToolkitOutput? output;
     try {
-      return await library.importPath(
+      output = await operation();
+      final WorkDocument saved = await library.importPath(
         sourcePath: output.path,
         displayName: '$prefix ${_stem(source.name)}.${output.format.extension}',
       );
+      await _completeJob(jobId, saved.path);
+      return saved;
+    } catch (_) {
+      await _failJob(jobId);
+      rethrow;
     } finally {
-      await engine.cleanup(output);
+      if (output != null) {
+        await engine.cleanup(output);
+      }
     }
+  }
+
+  Future<String?> _startJob(String tool, String inputPath) async {
+    try {
+      return await jobs?.start(tool: tool, inputPath: inputPath);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _completeJob(String? id, String outputPath) async {
+    if (id == null) return;
+    try {
+      await jobs?.complete(id, outputPath: outputPath);
+    } catch (_) {}
+  }
+
+  Future<void> _failJob(String? id) async {
+    if (id == null) return;
+    try {
+      await jobs?.fail(id);
+    } catch (_) {}
   }
 
   String _stem(String name) {

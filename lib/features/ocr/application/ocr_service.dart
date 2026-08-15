@@ -1,4 +1,5 @@
 import 'package:workkit/core/errors/app_failure.dart';
+import 'package:workkit/core/recovery/tool_job_tracker.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 import 'package:workkit/features/ocr/domain/ocr_engine.dart';
 import 'package:workkit/features/ocr/domain/ocr_repository.dart';
@@ -17,12 +18,14 @@ class OcrService {
     required this.pdfRenderer,
     required this.repository,
     this.extractor = const SmartExtractor(),
+    this.jobs,
   });
 
   final OcrEngine engine;
   final PdfOcrPageRenderer pdfRenderer;
   final OcrRepository repository;
   final SmartExtractor extractor;
+  final ToolJobTracker? jobs;
 
   Future<OcrDocumentResult> extract(WorkDocument document) async {
     final bool isPdf = document.type == 'pdf';
@@ -30,9 +33,11 @@ class OcrService {
       throw const ProcessingFailure('OCR supports images and PDF documents.');
     }
 
-    final List<String> paths =
-        isPdf ? await pdfRenderer.renderPdf(document.path) : <String>[document.path];
+    final String? jobId = await _startJob(document.path);
+    List<String> paths = const <String>[];
     try {
+      paths =
+          isPdf ? await pdfRenderer.renderPdf(document.path) : <String>[document.path];
       final List<String> pages = <String>[];
       for (final String path in paths) {
         pages.add(await engine.recognizeImage(path));
@@ -50,9 +55,13 @@ class OcrService {
         text: text,
         language: 'latin',
       );
+      await _completeJob(jobId);
       return OcrDocumentResult(text: text, entities: extractor.extract(text));
+    } catch (_) {
+      await _failJob(jobId);
+      rethrow;
     } finally {
-      if (isPdf) {
+      if (isPdf && paths.isNotEmpty) {
         await pdfRenderer.cleanup(paths);
       }
     }
@@ -80,5 +89,27 @@ class OcrService {
       text: normalized,
       entities: extractor.extract(normalized),
     );
+  }
+
+  Future<String?> _startJob(String inputPath) async {
+    try {
+      return await jobs?.start(tool: 'ocr', inputPath: inputPath);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _completeJob(String? id) async {
+    if (id == null) return;
+    try {
+      await jobs?.complete(id);
+    } catch (_) {}
+  }
+
+  Future<void> _failJob(String? id) async {
+    if (id == null) return;
+    try {
+      await jobs?.fail(id);
+    } catch (_) {}
   }
 }
