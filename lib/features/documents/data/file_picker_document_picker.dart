@@ -1,4 +1,4 @@
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:workkit/core/errors/app_failure.dart';
 import 'package:workkit/features/documents/domain/document_picker.dart';
 
@@ -7,15 +7,13 @@ class FilePickerDocumentPicker implements DocumentPicker {
 
   @override
   Future<PickedDocument?> pick() async {
-    final FilePickerResult? result = await FilePicker.pickFiles();
-
-    if (result == null || result.files.isEmpty) {
+    final XFile? file = await openFile();
+    if (file == null) {
       return null;
     }
 
-    final PlatformFile file = result.files.single;
-    final String? path = file.path;
-    if (path == null || path.trim().isEmpty) {
+    final String path = file.path.trim();
+    if (path.isEmpty) {
       throw const StorageFailure(
         'This file provider did not expose a local file path.',
       );
@@ -24,7 +22,7 @@ class FilePickerDocumentPicker implements DocumentPicker {
     return PickedDocument(
       name: file.name,
       path: path,
-      sizeBytes: file.size,
+      sizeBytes: await file.length(),
     );
   }
 }
