@@ -4,50 +4,43 @@ WorkKit is a free-first, local-first mobile toolkit for everyday document work.
 
 ## Current status
 
-**M0 — Foundation** is merged. **M1 — Document Library** is in development/review.
-
-The app now has a persistent local document library with device import, managed local copies, recent files, search, favorites, rename, delete, sharing/export, image previews, and storage usage reporting.
+M0 Foundation and M1 Document Library are merged. M2 adds a native on-device document scanner using ML Kit on Android and VisionKit on iOS.
 
 ## Tech baseline
 
 - Flutter stable / Dart >= 3.12
-- Riverpod
-- go_router
+- Riverpod + go_router
 - Drift + SQLite
-- file_picker for native device import
-- share_plus for platform share/export
-- Android first, iOS-ready architecture
+- file_picker + share_plus
+- doc_scan_flutter for native document scanning
+- No backend or account for core features
 
 ## Bootstrap platform folders
 
-If this checkout does not yet include generated `android/` and `ios/` folders, run once from the repository root:
+Android and iOS projects are reproducibly generated from source. Run:
 
 ```bash
-flutter create --org com.workkit --project-name workkit --platforms=android,ios .
+dart run tool/bootstrap_platforms.dart
 flutter pub get
 dart run build_runner build
 ```
 
-Then run:
+The bootstrap configures the iOS deployment target and camera permission needed by the scanner. CI runs the same bootstrap and builds an Android debug APK.
 
-```bash
-flutter run
-```
-
-## Quality checks
+## Development
 
 ```bash
 flutter analyze
 flutter test
+flutter run
 ```
 
 ## Product principles
 
-- Free-first
-- Offline/local-first
+- Free-first and offline/local-first
 - Privacy-first
-- No account required for core features
-- Imported source documents are copied into managed storage; originals are not modified
+- Imported and scanned files are copied into WorkKit-managed storage
+- Source files are never overwritten by default
 - Sensitive document content is never logged
 
-See `docs/product/mvp-scope.md` and `docs/architecture/overview.md`.
+See `docs/project/implementation-plan.md` for the milestone roadmap.

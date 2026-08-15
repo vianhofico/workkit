@@ -2,35 +2,31 @@
 
 ## Current milestone
 
-M1 — Document Library
+M2 — Scanner
 
-## M0 — completed
+## Completed
 
-- App bootstrapping entry point and ProviderScope root
-- Material 3 light/dark themes
-- Home / Files / Tools / Settings navigation
-- Drift v1 schema for core local entities
-- Safe local file writes
-- Universal `WorkKitAction` extension contract
-- Unit/widget/database test foundation
-- GitHub Actions quality workflow
-- First green CI and merge to `main`
+### M0 — Foundation
 
-## M1 — implemented in current branch
+Flutter shell, Material 3 theme, Riverpod, go_router, Drift schema, local safe-file service, repository abstractions, tests and CI.
 
-- Native file picker adapter
-- Import by copying source files into WorkKit-managed local storage
-- Persistent document metadata in Drift/SQLite
-- Reactive recent documents on Home
-- Search by document name/type
-- Favorites filter and favorite toggle
-- Rename display name without moving the managed file
-- Delete confirmation and managed-file cleanup
-- Share/export through the platform share sheet
-- Image preview thumbnails rendered from local files
-- Local library storage usage summary
-- Repository and import lifecycle tests
+### M1 — Document Library
+
+Device import, managed local copies, metadata persistence, recent files, search, favorites, rename, delete, share/export, image previews and storage reporting.
+
+## M2 — implemented in current branch
+
+- Reproducible Android/iOS platform bootstrap script
+- Android debug APK build added to CI
+- Scanner domain contract separated from native adapter
+- ML Kit document scanning on Android through `doc_scan_flutter`
+- VisionKit document scanning on iOS through `doc_scan_flutter`
+- Native crop/edge detection/rotation/enhancement flow
+- Scan to per-page images or PDF
+- Cancellation handling
+- Completed scans copied from temporary native paths into WorkKit managed storage
+- Scanner lifecycle tests with native adapter replaced by a fake
 
 ## Next code task
 
-Run CI for M1, fix any analyzer/test issues, merge M1, then generate and commit Android/iOS platform projects before M2 scanner integration.
+Get M2 CI green, merge it, then implement M3 OCR with the same adapter/application/UI boundary.
