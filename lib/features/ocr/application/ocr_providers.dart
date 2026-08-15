@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workkit/core/database/database_provider.dart';
+import 'package:workkit/core/recovery/recovery_provider.dart';
 import 'package:workkit/features/ocr/application/ocr_service.dart';
 import 'package:workkit/features/ocr/data/drift_ocr_repository.dart';
 import 'package:workkit/features/ocr/data/mlkit_ocr_engine.dart';
@@ -23,5 +24,6 @@ final Provider<OcrService> ocrServiceProvider = Provider<OcrService>((ref) {
     engine: ref.watch(ocrEngineProvider),
     pdfRenderer: ref.watch(pdfOcrPageRendererProvider),
     repository: ref.watch(ocrRepositoryProvider),
+    jobs: ref.watch(toolJobTrackerProvider),
   );
 });

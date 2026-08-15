@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:workkit/core/recovery/tool_job_tracker.dart';
 import 'package:workkit/core/storage/local_file_service.dart';
 import 'package:workkit/features/documents/application/document_library_service.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
@@ -14,12 +15,14 @@ class SignatureService {
     required this.storage,
     required this.library,
     required this.pdfEngine,
+    this.jobs,
   });
 
   final SignatureRepository repository;
   final LocalFileService storage;
   final DocumentLibraryService library;
   final SignaturePdfEngine pdfEngine;
+  final ToolJobTracker? jobs;
 
   Future<SavedSignature> saveSignature(String name, Uint8List pngBytes) async {
     final String normalizedName = name.trim();
@@ -31,7 +34,8 @@ class SignatureService {
     }
 
     final DateTime now = DateTime.now();
-    final String id = '${now.microsecondsSinceEpoch.toRadixString(36)}-${Random.secure().nextInt(0x7fffffff).toRadixString(36)}';
+    final String id =
+        '${now.microsecondsSinceEpoch.toRadixString(36)}-${Random.secure().nextInt(0x7fffffff).toRadixString(36)}';
     final file = await storage.atomicWrite(
       directory: 'signatures',
       fileName: '$id.png',
@@ -74,19 +78,50 @@ class SignatureService {
     if (document.type != 'pdf') {
       throw const FormatException('Choose a PDF document.');
     }
-    final PdfSignatureOutput output = await pdfEngine.placeSignature(
-      document.path,
-      signature.path,
-      placement,
-      password: password,
-    );
+    final String? jobId = await _startJob(document.path);
+    PdfSignatureOutput? output;
     try {
-      return await library.importPath(
+      output = await pdfEngine.placeSignature(
+        document.path,
+        signature.path,
+        placement,
+        password: password,
+      );
+      final WorkDocument saved = await library.importPath(
         sourcePath: output.path,
         displayName: 'Signed ${document.name}',
       );
+      await _completeJob(jobId, saved.path);
+      return saved;
+    } catch (_) {
+      await _failJob(jobId);
+      rethrow;
     } finally {
-      await pdfEngine.cleanup(output);
+      if (output != null) {
+        await pdfEngine.cleanup(output);
+      }
     }
+  }
+
+  Future<String?> _startJob(String inputPath) async {
+    try {
+      return await jobs?.start(tool: 'pdf:signature', inputPath: inputPath);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _completeJob(String? id, String outputPath) async {
+    if (id == null) return;
+    try {
+      await jobs?.complete(id, outputPath: outputPath);
+    } catch (_) {}
+  }
+
+  Future<void> _failJob(String? id) async {
+    if (id == null) return;
+    try {
+      await jobs?.fail(id);
+    } catch (_) {}
   }
 }

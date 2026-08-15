@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workkit/core/recovery/recovery_provider.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/image_tools/application/image_toolkit_service.dart';
 import 'package:workkit/features/image_tools/data/dart_image_toolkit_engine.dart';
@@ -12,5 +13,6 @@ final FutureProvider<ImageToolkitService> imageToolkitServiceProvider =
   return ImageToolkitService(
     engine: ref.watch(imageToolkitEngineProvider),
     library: await ref.watch(documentLibraryServiceProvider.future),
+    jobs: ref.watch(toolJobTrackerProvider),
   );
 });

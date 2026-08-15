@@ -1,23 +1,30 @@
 # WorkKit
 
-WorkKit is a free-first, local-first mobile toolkit for everyday document work.
+WorkKit is a free-first, local-first mobile toolkit for everyday document work. Version 1.0 keeps core processing on-device and does not require an account or backend.
 
-## Current status
+## Included tools
 
-M0 Foundation and M1 Document Library are merged. M2 adds a native on-device document scanner using ML Kit on Android and VisionKit on iOS.
+- Managed document library with import, search, favorites, rename, delete and share
+- Native multi-page document scanner
+- On-device OCR for images/PDFs with editable extracted text
+- PDF merge/split/reorder/delete/rotate, image↔PDF and encrypted-PDF handling
+- Reusable local signatures and PDF signature placement
+- QR scan, generation and local history
+- Image compression, resize, crop, JPG/PNG/WebP conversion and metadata removal
+- Local streaming backup/restore, interrupted-job recovery and abandoned-temp cleanup
 
 ## Tech baseline
 
 - Flutter stable / Dart >= 3.12
 - Riverpod + go_router
 - Drift + SQLite
-- file_picker + share_plus
-- doc_scan_flutter for native document scanning
+- `file_selector` + `share_plus`
+- Native/on-device document scanning and OCR
 - No backend or account for core features
 
 ## Bootstrap platform folders
 
-Android and iOS projects are reproducibly generated from source. Run:
+Android and iOS projects are reproducibly generated from source:
 
 ```bash
 dart run tool/bootstrap_platforms.dart
@@ -25,22 +32,26 @@ flutter pub get
 dart run build_runner build
 ```
 
-The bootstrap configures the iOS deployment target and camera permission needed by the scanner. CI runs the same bootstrap and builds an Android debug APK.
-
-## Development
+## Quality gates
 
 ```bash
 flutter analyze
-flutter test
-flutter run
+flutter test --coverage
+flutter build apk --debug
+flutter build appbundle --release
 ```
+
+Pull requests run these gates in GitHub Actions. The `Android Release AAB` manual workflow can additionally build a release AAB signed with repository secrets; see `docs/release/android-internal-testing.md`.
 
 ## Product principles
 
 - Free-first and offline/local-first
 - Privacy-first
-- Imported and scanned files are copied into WorkKit-managed storage
-- Source files are never overwritten by default
-- Sensitive document content is never logged
+- Imported and generated files live in WorkKit-managed storage
+- Source files are never overwritten by processing tools
+- Sensitive document content and PDF passwords are not intentionally logged
+- Backup bundles are portable and intentionally unencrypted; store them securely
 
-See `docs/project/implementation-plan.md` for the milestone roadmap.
+## Release status
+
+Repository implementation is code-complete through M7. Physical-device accessibility/performance/camera tests and Google Play internal testing remain account/hardware-bound validation tasks documented in `docs/project/external-validation.md`.

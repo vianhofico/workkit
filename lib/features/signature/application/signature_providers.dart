@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workkit/core/database/database_provider.dart';
+import 'package:workkit/core/recovery/recovery_provider.dart';
 import 'package:workkit/core/storage/local_file_service_provider.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/signature/application/signature_service.dart';
@@ -24,6 +25,7 @@ final FutureProvider<SignatureService> signatureServiceProvider =
     storage: await ref.watch(localFileServiceProvider.future),
     library: await ref.watch(documentLibraryServiceProvider.future),
     pdfEngine: ref.watch(signaturePdfEngineProvider),
+    jobs: ref.watch(toolJobTrackerProvider),
   );
 });
 
