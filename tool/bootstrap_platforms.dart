@@ -23,8 +23,16 @@ Future<void> main() async {
     return;
   }
 
+  await _deleteFlutterTemplateTest();
   await _patchIos();
   stdout.writeln('WorkKit Android/iOS platform bootstrap complete.');
+}
+
+Future<void> _deleteFlutterTemplateTest() async {
+  final File templateTest = File('test/widget_test.dart');
+  if (await templateTest.exists()) {
+    await templateTest.delete();
+  }
 }
 
 Future<void> _patchIos() async {
