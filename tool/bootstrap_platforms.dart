@@ -27,6 +27,7 @@ Future<void> main() async {
   await _patchAndroid();
   await _patchIos();
   await _verifyAndroidPrivacyHardening();
+  await _verifyAndroidReleaseHardening();
   stdout.writeln('WorkKit Android/iOS platform bootstrap complete.');
 }
 
@@ -105,6 +106,39 @@ Future<void> _patchAndroid() async {
 </network-security-config>
 ''',
   );
+
+  const String proguardRules = '''# WorkKit uses only ML Kit's Latin text recognizer.
+# The Flutter plugin references optional recognizers in a runtime switch, so R8
+# must tolerate their classes being absent when their language artifacts are not bundled.
+-dontwarn com.google.mlkit.vision.text.chinese.**
+-dontwarn com.google.mlkit.vision.text.devanagari.**
+-dontwarn com.google.mlkit.vision.text.japanese.**
+-dontwarn com.google.mlkit.vision.text.korean.**
+''';
+  await File('android/app/proguard-rules.pro').writeAsString(proguardRules);
+
+  final File gradle = File('android/app/build.gradle.kts');
+  if (await gradle.exists()) {
+    String content = await gradle.readAsString();
+    if (!content.contains('proguard-rules.pro')) {
+      const String signingMarker =
+          'signingConfig = signingConfigs.getByName("debug")';
+      if (!content.contains(signingMarker)) {
+        throw StateError(
+          'Unable to locate Flutter default release signing configuration.',
+        );
+      }
+      content = content.replaceFirst(
+        signingMarker,
+        '''$signingMarker
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )''',
+      );
+      await gradle.writeAsString(content);
+    }
+  }
 }
 
 Future<void> _patchIos() async {
@@ -175,6 +209,31 @@ Future<void> _verifyAndroidPrivacyHardening() async {
   ]) {
     if (!await File(path).exists()) {
       throw StateError('Android privacy hardening resource is missing: $path');
+    }
+  }
+}
+
+Future<void> _verifyAndroidReleaseHardening() async {
+  final File gradle = File('android/app/build.gradle.kts');
+  final File proguard = File('android/app/proguard-rules.pro');
+  if (!await gradle.exists() || !await proguard.exists()) {
+    throw StateError('Android release hardening files are missing.');
+  }
+
+  final String gradleContent = await gradle.readAsString();
+  if (!gradleContent.contains('proguard-rules.pro')) {
+    throw StateError('Android release build is missing custom R8 rules.');
+  }
+
+  final String rules = await proguard.readAsString();
+  for (final String namespace in <String>[
+    'com.google.mlkit.vision.text.chinese.**',
+    'com.google.mlkit.vision.text.devanagari.**',
+    'com.google.mlkit.vision.text.japanese.**',
+    'com.google.mlkit.vision.text.korean.**',
+  ]) {
+    if (!rules.contains('-dontwarn $namespace')) {
+      throw StateError('Android release R8 rule is missing: $namespace');
     }
   }
 }
