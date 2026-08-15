@@ -109,6 +109,18 @@ class LocalFileService {
           }
         }
       }
+      await for (final FileSystemEntity entity
+          in _rootDirectory.list(followLinks: false)) {
+        final String name = entity.path.split(Platform.pathSeparator).last;
+        if (entity is Directory && name.startsWith('workkit_restore_staging_')) {
+          recovered += await _entitySize(entity);
+          try {
+            await entity.delete(recursive: true);
+          } on FileSystemException {
+            // Best-effort recovery.
+          }
+        }
+      }
     }
 
     final Directory systemTemp = Directory.systemTemp;
@@ -179,8 +191,7 @@ class LocalFileService {
     return name.startsWith('workkit_pdf_') ||
         name.startsWith('workkit_image_') ||
         name.startsWith('workkit_ocr_pdf_') ||
-        name.startsWith('workkit_signature_pdf_') ||
-        name.startsWith('workkit_restore_staging_');
+        name.startsWith('workkit_signature_pdf_');
   }
 
   Future<int> _entitySize(FileSystemEntity entity) async {
