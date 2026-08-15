@@ -41,7 +41,7 @@ Status: Complete
 - [x] Large-file streaming strategy
 
 ## M5 — Signature and QR
-Status: In review
+Status: Complete
 - [x] Draw/save signatures locally
 - [x] Place/resize/rotate signature on PDF
 - [x] QR scan
@@ -49,11 +49,12 @@ Status: In review
 - [x] QR history
 
 ## M6 — Image Toolkit
-- [ ] Compress
-- [ ] Resize
-- [ ] Crop
-- [ ] JPG/PNG/WebP conversion
-- [ ] Metadata removal
+Status: In review
+- [x] Compress
+- [x] Resize
+- [x] Crop
+- [x] JPG/PNG/WebP conversion
+- [x] Metadata removal
 
 ## M7 — Production Hardening
 - [ ] Accessibility pass
