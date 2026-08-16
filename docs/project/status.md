@@ -2,7 +2,7 @@
 
 ## Current state
 
-WorkKit 1.1.0 source is code-complete through M8 once the M8 branch passes CI and is merged. External physical-device/store validation remains separate because it cannot be truthfully completed by repository CI alone.
+WorkKit 1.1.0 is code-complete through M8 and merged into `main`. The final `main` CI is green for localization generation, launcher icon generation, analyzer, tests, Android debug APK and Android release AAB. External physical-device/store validation remains separate because it cannot be truthfully completed by repository CI alone.
 
 ## Completed in repository
 
@@ -27,6 +27,7 @@ WorkKit 1.1.0 source is code-complete through M8 once the M8 branch passes CI an
 - The official WorkKit launcher icon is generated for Android/iOS during CI/release bootstrap.
 - Android/iOS product display names are explicitly normalized to `WorkKit`.
 - CI generates localization source and launcher icons before analyzer/tests/builds.
+- PR #14 was merged into `main` and the post-merge CI completed successfully.
 
 ## External validation remaining
 
