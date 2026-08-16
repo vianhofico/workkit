@@ -144,7 +144,9 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(labelText: l10n.name),
             onSubmitted: (String value) {
-              if (value.trim().isNotEmpty) Navigator.of(dialogContext).pop(value);
+              if (value.trim().isNotEmpty) {
+                Navigator.of(dialogContext).pop(value);
+              }
             },
           ),
           actions: <Widget>[
@@ -166,7 +168,9 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
     );
     controller.dispose();
 
-    if (newName == null || newName.trim() == document.name) return;
+    if (newName == null || newName.trim() == document.name) {
+      return;
+    }
     try {
       final service = await ref.read(documentLibraryServiceProvider.future);
       await service.rename(document, newName);

@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workkit/core/database/app_database.dart';
 import 'package:workkit/core/database/database_provider.dart';

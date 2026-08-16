@@ -123,17 +123,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _createBackup() async {
+    final l10n = context.l10n;
+    final Size size = MediaQuery.sizeOf(context);
     setState(() => _busy = true);
     try {
       final BackupService service = await ref.read(backupServiceProvider.future);
       final File backup = await service.createBackup();
-      if (!mounted) return;
-      final Size size = MediaQuery.sizeOf(context);
       await SharePlus.instance.share(
         ShareParams(
           files: <XFile>[XFile(backup.path)],
-          title: context.l10n.backupShareTitle,
-          subject: context.l10n.backupShareTitle,
+          title: l10n.backupShareTitle,
+          subject: l10n.backupShareTitle,
           sharePositionOrigin: Rect.fromCenter(
             center: Offset(size.width / 2, size.height / 2),
             width: 1,
@@ -141,17 +141,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
       );
-      _show(context.l10n.backupCreated);
+      _show(l10n.backupCreated);
     } on AppFailure catch (error) {
-      _show(context.localizedFailure(error));
+      _show(localizeAppFailure(l10n, error));
     } catch (_) {
-      _show(context.l10n.backupCreateFailed);
+      _show(l10n.backupCreateFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _restoreBackup() async {
+    final l10n = context.l10n;
     final PickedDocument? selected = await ref.read(documentPickerProvider).pick();
     if (selected == null || !mounted) return;
     final bool confirmed = await showDialog<bool>(
@@ -178,24 +179,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final BackupService service = await ref.read(backupServiceProvider.future);
       final BackupRestoreSummary summary = await service.restoreBackup(selected.path);
-      _show(context.l10n.restoredSummary(summary.documents, summary.signatures));
+      _show(l10n.restoredSummary(summary.documents, summary.signatures));
     } on AppFailure catch (error) {
-      _show(context.localizedFailure(error));
+      _show(localizeAppFailure(l10n, error));
     } catch (_) {
-      _show(context.l10n.backupRestoreFailed);
+      _show(l10n.backupRestoreFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _recoverStorage() async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       final storage = await ref.read(localFileServiceProvider.future);
       final int bytes = await storage.recoverAbandonedFiles();
-      _show(context.l10n.recoveredTemporary(_formatBytes(bytes)));
+      _show(l10n.recoveredTemporary(_formatBytes(bytes)));
     } catch (_) {
-      _show(context.l10n.storageRecoveryFailed);
+      _show(l10n.storageRecoveryFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }

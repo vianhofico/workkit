@@ -279,32 +279,34 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
   }
 
   Future<void> _saveSignature() async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       final bytes = await _signatureController.toPngBytes(width: 800, height: 300);
       if (bytes == null || bytes.isEmpty) {
-        throw FormatException(context.l10n.drawSignatureBeforeSaving);
+        throw FormatException(l10n.drawSignatureBeforeSaving);
       }
       final SignatureService service = await ref.read(signatureServiceProvider.future);
-      final String name = _name.text.trim().isEmpty ? context.l10n.mySignature : _name.text.trim();
+      final String name = _name.text.trim().isEmpty ? l10n.mySignature : _name.text.trim();
       final SavedSignature saved = await service.saveSignature(name, bytes);
       _signatureController.clear();
       if (mounted) {
         setState(() => _selectedSignatureId = saved.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.signatureSaved)),
+          SnackBar(content: Text(l10n.signatureSaved)),
         );
       }
     } on FormatException catch (error) {
       _show(error.message);
     } catch (_) {
-      _show(context.l10n.signatureSaveFailed);
+      _show(l10n.signatureSaveFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _deleteSignature(SavedSignature signature) async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       final SignatureService service = await ref.read(signatureServiceProvider.future);
@@ -313,13 +315,14 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
         setState(() => _selectedSignatureId = null);
       }
     } catch (_) {
-      _show(context.l10n.signatureDeleteFailed);
+      _show(l10n.signatureDeleteFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _checkGeometry(WorkDocument document) async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       final int page = _pageIndex();
@@ -331,25 +334,26 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
       );
       if (mounted) setState(() => _geometry = geometry);
     } on SignaturePdfException catch (error) {
-      _show(error.passwordRequired ? context.l10n.pdfPasswordRequired : context.l10n.pdfInspectFailed);
+      _show(error.passwordRequired ? l10n.pdfPasswordRequired : l10n.pdfInspectFailed);
     } on FormatException catch (error) {
       _show(error.message);
     } catch (_) {
-      _show(context.l10n.pdfInspectFailed);
+      _show(l10n.pdfInspectFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _signPdf(WorkDocument document, SavedSignature signature) async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       final PdfSignaturePlacement placement = PdfSignaturePlacement(
         page: _pageIndex(),
         x: _double(_x, 'X'),
         y: _double(_y, 'Y'),
-        width: _double(_width, context.l10n.width),
-        height: _double(_height, context.l10n.height),
+        width: _double(_width, l10n.width),
+        height: _double(_height, l10n.height),
         rotationDegrees: _rotation,
       );
       final SignatureService service = await ref.read(signatureServiceProvider.future);
@@ -361,15 +365,15 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.savedNamedToWorkKit(output.name))),
+          SnackBar(content: Text(l10n.savedNamedToWorkKit(output.name))),
         );
       }
     } on SignaturePdfException catch (error) {
-      _show(error.passwordRequired ? context.l10n.pdfPasswordRequired : context.l10n.signedPdfFailed);
+      _show(error.passwordRequired ? l10n.pdfPasswordRequired : l10n.signedPdfFailed);
     } on FormatException catch (error) {
       _show(error.message);
     } catch (_) {
-      _show(context.l10n.signedPdfFailed);
+      _show(l10n.signedPdfFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }

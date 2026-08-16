@@ -174,6 +174,7 @@ class _QrScreenState extends ConsumerState<QrScreen> {
   }
 
   Future<void> _recordCapture(BarcodeCapture capture) async {
+    final l10n = context.l10n;
     for (final Barcode barcode in capture.barcodes) {
       final String value = barcode.rawValue?.trim() ?? '';
       if (value.isEmpty) continue;
@@ -190,24 +191,21 @@ class _QrScreenState extends ConsumerState<QrScreen> {
         if (mounted) {
           setState(() {});
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.l10n.qrSavedHistory)),
+            SnackBar(content: Text(l10n.qrSavedHistory)),
           );
         }
       } catch (_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.l10n.qrSaveFailed)),
-          );
-        }
+        _show(l10n.qrSaveFailed);
       }
       return;
     }
   }
 
   Future<void> _generate() async {
+    final l10n = context.l10n;
     final String value = _content.text.trim();
     if (value.isEmpty) {
-      _show(context.l10n.enterQrContent);
+      _show(l10n.enterQrContent);
       return;
     }
     setState(() => _busy = true);
@@ -215,18 +213,19 @@ class _QrScreenState extends ConsumerState<QrScreen> {
       await ref.read(qrServiceProvider).recordGenerated(value);
       if (mounted) setState(() => _generated = value);
     } catch (_) {
-      _show(context.l10n.generatedQrSaveFailed);
+      _show(l10n.generatedQrSaveFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _clearHistory() async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
       await ref.read(qrServiceProvider).clearHistory();
     } catch (_) {
-      _show(context.l10n.qrClearFailed);
+      _show(l10n.qrClearFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }

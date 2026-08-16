@@ -184,6 +184,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
       _operation == _PdfOperation.rotate;
 
   Future<void> _run(List<WorkDocument> all) async {
+    final l10n = context.l10n;
     final List<WorkDocument> selected =
         all.where((item) => _selected.contains(item.id)).toList(growable: false);
     if (selected.isEmpty) return;
@@ -215,7 +216,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
         case _PdfOperation.rotate:
           final int degrees = int.tryParse(_number.text.trim()) ?? 0;
           if (!<int>{90, 180, 270}.contains(degrees)) {
-            throw FormatException(context.l10n.rotationInvalid);
+            throw FormatException(l10n.rotationInvalid);
           }
           output = await service.rotatePages(
             selected.first,
@@ -228,31 +229,27 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
       if (mounted) {
         setState(() => _outputs = output);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.createdManagedFiles(output.length))),
+          SnackBar(content: Text(l10n.createdManagedFiles(output.length))),
         );
       }
     } on PdfToolkitException catch (error) {
-      if (mounted) {
-        final String message = error.passwordRequired
-            ? context.l10n.pdfPasswordRequired
-            : context.l10n.pdfOperationFailed;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-      }
+      final String message = error.passwordRequired
+          ? l10n.pdfPasswordRequired
+          : l10n.pdfOperationFailed;
+      _show(message);
     } on FormatException catch (error) {
-      if (mounted) {
-        final String message = error.message == context.l10n.rotationInvalid
-            ? error.message
-            : context.l10n.pdfOperationFailed;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-      }
+      final String message =
+          error.message == l10n.rotationInvalid ? error.message : l10n.pdfOperationFailed;
+      _show(message);
     } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.pdfOperationFailed)),
-        );
-      }
+      _show(l10n.pdfOperationFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  void _show(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }

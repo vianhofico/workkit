@@ -271,9 +271,9 @@ class _ImageToolkitScreenState extends ConsumerState<ImageToolkitScreen> {
   }
 
   Future<void> _run(WorkDocument selected) async {
+    final l10n = context.l10n;
     setState(() => _busy = true);
     try {
-      final l10n = context.l10n;
       final ImageToolkitService service = await ref.read(imageToolkitServiceProvider.future);
       late WorkDocument output;
       switch (_operation) {
@@ -306,15 +306,15 @@ class _ImageToolkitScreenState extends ConsumerState<ImageToolkitScreen> {
       if (mounted) {
         setState(() => _output = output);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.l10n.savedNamed(output.name))),
+          SnackBar(content: Text(l10n.savedNamed(output.name))),
         );
       }
     } on FormatException catch (error) {
       _show(error.message);
     } on ImageToolkitException catch (_) {
-      _show(context.l10n.imageOperationFailed);
+      _show(l10n.imageOperationFailed);
     } catch (_) {
-      _show(context.l10n.imageOperationFailed);
+      _show(l10n.imageOperationFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
