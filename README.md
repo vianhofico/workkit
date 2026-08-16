@@ -41,7 +41,7 @@ flutter build apk --debug
 flutter build appbundle --release
 ```
 
-Pull requests run these gates in GitHub Actions. The `Android Release AAB` manual workflow can additionally build a release AAB signed with repository secrets; see `docs/release/android-internal-testing.md`.
+Pull requests run these gates in GitHub Actions. Successful CI runs retain a debug APK and an unsigned release AAB as downloadable workflow artifacts. The `Android Release AAB` manual workflow additionally builds and uploads a signed release AAB when repository signing secrets are configured; see `docs/release/android-internal-testing.md`.
 
 ## Product principles
 
