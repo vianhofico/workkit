@@ -71,7 +71,7 @@ Status: Code complete; external release validation pending
 - [ ] Play Store internal testing — external Play Console validation
 
 ## M8 — Localization and Product Identity
-Status: Complete when M8 CI is green and merged
+Status: Complete
 - [x] Flutter `gen_l10n` infrastructure
 - [x] English and Vietnamese ARB catalogs with key parity
 - [x] System / Vietnamese / English locale preference
@@ -87,5 +87,6 @@ Status: Complete when M8 CI is green and merged
 - [x] Android/iOS display name normalized to `WorkKit`
 - [x] Localization documentation
 - [x] README updated for WorkKit 1.1.0
+- [x] PR #14 merged and post-merge `main` CI green
 
 See `docs/project/external-validation.md` for remaining hardware/account-bound checks.
