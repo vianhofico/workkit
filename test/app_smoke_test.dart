@@ -1,18 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:workkit/app/workkit_app.dart';
+import 'package:workkit/core/localization/app_locale.dart';
+import 'package:workkit/core/localization/locale_provider.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 
 void main() {
-  testWidgets('shows WorkKit home foundation', (WidgetTester tester) async {
+  testWidgets('shows WorkKit home foundation in English', (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          localePreferenceProvider.overrideWith(
+            (ref) => Stream<AppLocalePreference>.value(AppLocalePreference.english),
+          ),
           documentsProvider.overrideWith(
-            (ref) => Stream<List<WorkDocument>>.value(
-              const <WorkDocument>[],
-            ),
+            (ref) => Stream<List<WorkDocument>>.value(const <WorkDocument>[]),
           ),
         ],
         child: const WorkKitApp(),

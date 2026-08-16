@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 import 'package:workkit/features/pdf/application/pdf_toolkit_providers.dart';
 import 'package:workkit/features/pdf/application/pdf_toolkit_service.dart';
 import 'package:workkit/features/pdf/domain/page_selection_parser.dart';
 import 'package:workkit/features/pdf/domain/pdf_toolkit_engine.dart';
+import 'package:workkit/l10n/app_localizations.dart';
 
-enum _PdfOperation {
-  imagesToPdf('Image to PDF'),
-  merge('Merge PDFs'),
-  split('Split PDF'),
-  deletePages('Delete pages'),
-  reorder('Reorder pages'),
-  rotate('Rotate pages'),
-  toImages('PDF to images');
+enum _PdfOperation { imagesToPdf, merge, split, deletePages, reorder, rotate, toImages }
 
-  const _PdfOperation(this.label);
-  final String label;
+extension on _PdfOperation {
+  String label(AppLocalizations l10n) => switch (this) {
+        _PdfOperation.imagesToPdf => l10n.opImageToPdf,
+        _PdfOperation.merge => l10n.opMergePdfs,
+        _PdfOperation.split => l10n.opSplitPdf,
+        _PdfOperation.deletePages => l10n.opDeletePages,
+        _PdfOperation.reorder => l10n.opReorderPages,
+        _PdfOperation.rotate => l10n.opRotatePages,
+        _PdfOperation.toImages => l10n.opPdfToImages,
+      };
 }
 
 class PdfToolkitScreen extends ConsumerStatefulWidget {
@@ -46,12 +49,13 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AsyncValue<List<WorkDocument>> asyncDocuments = ref.watch(documentsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('PDF toolkit')),
+      appBar: AppBar(title: Text(l10n.pdfToolkit)),
       body: asyncDocuments.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => const Center(child: Text('Unable to load documents.')),
+        error: (error, stack) => Center(child: Text(l10n.unableLoadDocuments)),
         data: (documents) {
           final List<WorkDocument> candidates = _operation == _PdfOperation.imagesToPdf
               ? documents.where((item) => item.type == 'image').toList()
@@ -59,15 +63,15 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
           return ListView(
             padding: const EdgeInsets.all(20),
             children: <Widget>[
-              Text('Local PDF operations', style: Theme.of(context).textTheme.headlineSmall),
+              Text(l10n.localPdfOperations, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 8),
-              const Text('Operations stream files from disk and write new managed copies. Original files are never overwritten.'),
+              Text(l10n.pdfDescription),
               const SizedBox(height: 20),
               DropdownButtonFormField<_PdfOperation>(
                 initialValue: _operation,
-                decoration: const InputDecoration(labelText: 'Operation', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: l10n.operation, border: const OutlineInputBorder()),
                 items: _PdfOperation.values
-                    .map((item) => DropdownMenuItem(value: item, child: Text(item.label)))
+                    .map((item) => DropdownMenuItem(value: item, child: Text(item.label(l10n))))
                     .toList(),
                 onChanged: _busy
                     ? null
@@ -82,10 +86,10 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
                       },
               ),
               const SizedBox(height: 16),
-              Text('Choose ${_isMulti ? 'files' : 'a file'}', style: Theme.of(context).textTheme.titleMedium),
+              Text(_isMulti ? l10n.chooseFiles : l10n.chooseFile, style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               if (candidates.isEmpty)
-                const Text('No compatible files in the library yet.')
+                Text(l10n.noCompatibleFiles)
               else
                 Wrap(
                   spacing: 8,
@@ -98,9 +102,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
                           ? null
                           : (selected) {
                               setState(() {
-                                if (!_isMulti) {
-                                  _selected.clear();
-                                }
+                                if (!_isMulti) _selected.clear();
                                 if (selected) {
                                   _selected.add(document.id);
                                 } else {
@@ -117,8 +119,8 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
                   controller: _pages,
                   decoration: InputDecoration(
                     labelText: _operation == _PdfOperation.reorder
-                        ? 'New page order (e.g. 3,1,2)'
-                        : 'Pages (e.g. 1,3-5)',
+                        ? l10n.newPageOrder
+                        : l10n.pagesExample,
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -130,8 +132,8 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: _operation == _PdfOperation.split
-                        ? 'Pages per output PDF'
-                        : 'Rotation degrees: 90, 180 or 270',
+                        ? l10n.pagesPerOutput
+                        : l10n.rotationDegrees,
                     border: const OutlineInputBorder(),
                   ),
                 ),
@@ -141,9 +143,9 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
                 TextField(
                   controller: _password,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'PDF password (only if protected)',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.pdfPassword,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -151,7 +153,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
               FilledButton.icon(
                 onPressed: _busy || _selected.isEmpty ? null : () => _run(documents),
                 icon: const Icon(Icons.play_arrow),
-                label: const Text('Run locally'),
+                label: Text(l10n.runLocally),
               ),
               if (_busy) ...<Widget>[
                 const SizedBox(height: 12),
@@ -159,7 +161,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
               ],
               if (_outputs.isNotEmpty) ...<Widget>[
                 const SizedBox(height: 24),
-                Text('Saved to WorkKit', style: Theme.of(context).textTheme.titleMedium),
+                Text(l10n.savedToWorkKit, style: Theme.of(context).textTheme.titleMedium),
                 ..._outputs.map((item) => ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: Icon(item.type == 'pdf' ? Icons.picture_as_pdf : Icons.image),
@@ -182,6 +184,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
       _operation == _PdfOperation.rotate;
 
   Future<void> _run(List<WorkDocument> all) async {
+    final l10n = context.l10n;
     final List<WorkDocument> selected =
         all.where((item) => _selected.contains(item.id)).toList(growable: false);
     if (selected.isEmpty) return;
@@ -213,7 +216,7 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
         case _PdfOperation.rotate:
           final int degrees = int.tryParse(_number.text.trim()) ?? 0;
           if (!<int>{90, 180, 270}.contains(degrees)) {
-            throw const FormatException('Rotation must be 90, 180 or 270 degrees.');
+            throw FormatException(l10n.rotationInvalid);
           }
           output = await service.rotatePages(
             selected.first,
@@ -226,25 +229,27 @@ class _PdfToolkitScreenState extends ConsumerState<PdfToolkitScreen> {
       if (mounted) {
         setState(() => _outputs = output);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Created ${output.length} managed file(s).')),
+          SnackBar(content: Text(l10n.createdManagedFiles(output.length))),
         );
       }
     } on PdfToolkitException catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
-      }
+      final String message = error.passwordRequired
+          ? l10n.pdfPasswordRequired
+          : l10n.pdfOperationFailed;
+      _show(message);
     } on FormatException catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
-      }
+      final String message =
+          error.message == l10n.rotationInvalid ? error.message : l10n.pdfOperationFailed;
+      _show(message);
     } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PDF operation failed.')),
-        );
-      }
+      _show(l10n.pdfOperationFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  void _show(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 
@@ -19,6 +21,7 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AsyncValue<List<WorkDocument>> documents = ref.watch(documentsProvider);
 
     return ListView(
@@ -27,10 +30,7 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
         Row(
           children: <Widget>[
             Expanded(
-              child: Text(
-                'Files',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
+              child: Text(l10n.files, style: Theme.of(context).textTheme.headlineMedium),
             ),
             FilledButton.icon(
               onPressed: _isImporting ? null : _importDocument,
@@ -40,29 +40,23 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.file_open_outlined),
-              label: Text(_isImporting ? 'Importing' : 'Import'),
+              label: Text(_isImporting ? l10n.importing : l10n.import),
             ),
           ],
         ),
         const SizedBox(height: 16),
         SearchBar(
           leading: const Icon(Icons.search),
-          hintText: 'Search documents',
+          hintText: l10n.searchDocuments,
           onChanged: (String value) {
             setState(() => _query = value.trim().toLowerCase());
           },
         ),
         const SizedBox(height: 12),
-        Row(
-          children: <Widget>[
-            FilterChip(
-              label: const Text('Favorites'),
-              selected: _favoritesOnly,
-              onSelected: (bool value) {
-                setState(() => _favoritesOnly = value);
-              },
-            ),
-          ],
+        FilterChip(
+          label: Text(l10n.favorites),
+          selected: _favoritesOnly,
+          onSelected: (bool value) => setState(() => _favoritesOnly = value),
         ),
         const SizedBox(height: 18),
         documents.when(
@@ -116,18 +110,12 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
     try {
       final service = await ref.read(documentLibraryServiceProvider.future);
       final WorkDocument? document = await service.importFromDevice();
-      if (!mounted || document == null) {
-        return;
-      }
-      _showMessage('Imported ${document.name}');
-    } catch (error) {
-      if (mounted) {
-        _showMessage('Could not import this file. $error');
-      }
+      if (!mounted || document == null) return;
+      _showMessage(context.l10n.importedDocument(document.name));
+    } catch (_) {
+      if (mounted) _showMessage(context.l10n.importFailed);
     } finally {
-      if (mounted) {
-        setState(() => _isImporting = false);
-      }
+      if (mounted) setState(() => _isImporting = false);
     }
   }
 
@@ -137,27 +125,24 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
             document.id,
             isFavorite: !document.isFavorite,
           );
-    } catch (error) {
-      if (mounted) {
-        _showMessage('Could not update favorite. $error');
-      }
+    } catch (_) {
+      if (mounted) _showMessage(context.l10n.favoriteUpdateFailed);
     }
   }
 
   Future<void> _renameDocument(WorkDocument document) async {
-    final TextEditingController controller = TextEditingController(
-      text: document.name,
-    );
+    final TextEditingController controller = TextEditingController(text: document.name);
     final String? newName = await showDialog<String>(
       context: context,
       builder: (BuildContext dialogContext) {
+        final l10n = dialogContext.l10n;
         return AlertDialog(
-          title: const Text('Rename document'),
+          title: Text(l10n.renameDocument),
           content: TextField(
             controller: controller,
             autofocus: true,
             textInputAction: TextInputAction.done,
-            decoration: const InputDecoration(labelText: 'Name'),
+            decoration: InputDecoration(labelText: l10n.name),
             onSubmitted: (String value) {
               if (value.trim().isNotEmpty) {
                 Navigator.of(dialogContext).pop(value);
@@ -167,7 +152,7 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -175,7 +160,7 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
                   Navigator.of(dialogContext).pop(controller.text);
                 }
               },
-              child: const Text('Rename'),
+              child: Text(l10n.rename),
             ),
           ],
         );
@@ -186,14 +171,11 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
     if (newName == null || newName.trim() == document.name) {
       return;
     }
-
     try {
       final service = await ref.read(documentLibraryServiceProvider.future);
       await service.rename(document, newName);
-    } catch (error) {
-      if (mounted) {
-        _showMessage('Could not rename this document. $error');
-      }
+    } catch (_) {
+      if (mounted) _showMessage(context.l10n.renameFailed);
     }
   }
 
@@ -201,40 +183,32 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
     final bool confirmed = await showDialog<bool>(
           context: context,
           builder: (BuildContext dialogContext) {
+            final l10n = dialogContext.l10n;
             return AlertDialog(
-              title: const Text('Delete document?'),
-              content: Text(
-                '${document.name} will be removed from this device. This cannot be undone.',
-              ),
+              title: Text(l10n.deleteDocumentTitle),
+              content: Text(l10n.deleteDocumentContent(document.name)),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(false),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.of(dialogContext).pop(true),
-                  child: const Text('Delete'),
+                  child: Text(l10n.delete),
                 ),
               ],
             );
           },
         ) ??
         false;
-
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       final service = await ref.read(documentLibraryServiceProvider.future);
       await service.delete(document);
-      if (mounted) {
-        _showMessage('Deleted ${document.name}');
-      }
-    } catch (error) {
-      if (mounted) {
-        _showMessage('Could not delete this document. $error');
-      }
+      if (mounted) _showMessage(context.l10n.deletedDocument(document.name));
+    } catch (_) {
+      if (mounted) _showMessage(context.l10n.deleteFailed);
     }
   }
 
@@ -244,10 +218,8 @@ class _FilesScreenState extends ConsumerState<FilesScreen> {
             document,
             sharePositionOrigin: origin,
           );
-    } catch (error) {
-      if (mounted) {
-        _showMessage('Could not share this document. $error');
-      }
+    } catch (_) {
+      if (mounted) _showMessage(context.l10n.shareFailed);
     }
   }
 
@@ -265,13 +237,12 @@ class _LibrarySummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final int totalBytes = documents.fold<int>(
       0,
       (int total, WorkDocument document) => total + document.sizeBytes,
     );
-    final int favoriteCount = documents
-        .where((WorkDocument document) => document.isFavorite)
-        .length;
+    final int favoriteCount = documents.where((document) => document.isFavorite).length;
 
     return Card(
       child: Padding(
@@ -280,18 +251,9 @@ class _LibrarySummary extends StatelessWidget {
           spacing: 18,
           runSpacing: 8,
           children: <Widget>[
-            _SummaryItem(
-              icon: Icons.description_outlined,
-              label: '${documents.length} files',
-            ),
-            _SummaryItem(
-              icon: Icons.storage_outlined,
-              label: _formatSize(totalBytes),
-            ),
-            _SummaryItem(
-              icon: Icons.star_outline,
-              label: '$favoriteCount favorites',
-            ),
+            _SummaryItem(icon: Icons.description_outlined, label: l10n.fileCount(documents.length)),
+            _SummaryItem(icon: Icons.storage_outlined, label: _formatSize(totalBytes)),
+            _SummaryItem(icon: Icons.star_outline, label: l10n.favoriteCount(favoriteCount)),
           ],
         ),
       ),
@@ -335,18 +297,15 @@ class _DocumentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: ListTile(
         contentPadding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
         leading: _DocumentThumbnail(document: document),
-        title: Text(
-          document.name,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: Text(document.name, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(
-          '${_labelForType(document.type)} · ${_formatSize(document.sizeBytes)} · ${_formatUpdated(document.updatedAt)}',
+          '${_labelForType(context, document.type)} · ${_formatSize(document.sizeBytes)} · ${_formatUpdated(context, document.updatedAt)}',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -354,21 +313,18 @@ class _DocumentTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             IconButton(
-              tooltip: document.isFavorite ? 'Remove favorite' : 'Add favorite',
+              tooltip: document.isFavorite ? l10n.removeFavorite : l10n.addFavorite,
               onPressed: onToggleFavorite,
-              icon: Icon(
-                document.isFavorite ? Icons.star : Icons.star_border,
-              ),
+              icon: Icon(document.isFavorite ? Icons.star : Icons.star_border),
             ),
             Builder(
               builder: (BuildContext menuContext) {
                 return PopupMenuButton<_DocumentAction>(
-                  tooltip: 'Document actions',
+                  tooltip: l10n.documentActions,
                   onSelected: (_DocumentAction action) {
                     switch (action) {
                       case _DocumentAction.share:
-                        final RenderBox? box =
-                            menuContext.findRenderObject() as RenderBox?;
+                        final RenderBox? box = menuContext.findRenderObject() as RenderBox?;
                         final Rect origin = box == null
                             ? const Rect.fromLTWH(0, 0, 1, 1)
                             : box.localToGlobal(Offset.zero) & box.size;
@@ -379,27 +335,26 @@ class _DocumentTile extends StatelessWidget {
                         onDelete();
                     }
                   },
-                  itemBuilder: (BuildContext context) => const <
-                      PopupMenuEntry<_DocumentAction>>[
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<_DocumentAction>>[
                     PopupMenuItem<_DocumentAction>(
                       value: _DocumentAction.share,
                       child: ListTile(
-                        leading: Icon(Icons.ios_share_outlined),
-                        title: Text('Share / export'),
+                        leading: const Icon(Icons.ios_share_outlined),
+                        title: Text(l10n.shareExport),
                       ),
                     ),
                     PopupMenuItem<_DocumentAction>(
                       value: _DocumentAction.rename,
                       child: ListTile(
-                        leading: Icon(Icons.edit_outlined),
-                        title: Text('Rename'),
+                        leading: const Icon(Icons.edit_outlined),
+                        title: Text(l10n.rename),
                       ),
                     ),
                     PopupMenuItem<_DocumentAction>(
                       value: _DocumentAction.delete,
                       child: ListTile(
-                        leading: Icon(Icons.delete_outline),
-                        title: Text('Delete'),
+                        leading: const Icon(Icons.delete_outline),
+                        title: Text(l10n.delete),
                       ),
                     ),
                   ],
@@ -415,7 +370,6 @@ class _DocumentTile extends StatelessWidget {
 
 class _DocumentThumbnail extends StatelessWidget {
   const _DocumentThumbnail({required this.document});
-
   final WorkDocument document;
 
   @override
@@ -436,14 +390,12 @@ class _DocumentThumbnail extends StatelessWidget {
         ),
       );
     }
-
     return _FileIcon(type: document.type);
   }
 }
 
 class _FileIcon extends StatelessWidget {
   const _FileIcon({required this.type});
-
   final String type;
 
   @override
@@ -457,7 +409,6 @@ class _FileIcon extends StatelessWidget {
       'document' => Icons.article_outlined,
       _ => Icons.insert_drive_file_outlined,
     };
-
     return SizedBox.square(
       dimension: 44,
       child: DecoratedBox(
@@ -472,22 +423,19 @@ class _FileIcon extends StatelessWidget {
 }
 
 class _EmptyFilesState extends StatelessWidget {
-  const _EmptyFilesState({
-    required this.hasDocuments,
-    required this.filtered,
-  });
-
+  const _EmptyFilesState({required this.hasDocuments, required this.filtered});
   final bool hasDocuments;
   final bool filtered;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final String title = filtered && hasDocuments
-        ? 'No matching documents.'
-        : 'No documents yet.';
+        ? l10n.noMatchingDocuments
+        : l10n.noDocumentsYet;
     final String subtitle = filtered && hasDocuments
-        ? 'Try another search or remove the favorites filter.'
-        : 'Import a file to start your local library.';
+        ? l10n.searchHintEmpty
+        : l10n.libraryEmpty;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 48),
@@ -509,15 +457,16 @@ class _FilesErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 48),
+    final l10n = context.l10n;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48),
       child: Column(
         children: <Widget>[
-          Icon(Icons.error_outline, size: 42),
-          SizedBox(height: 12),
-          Text('Could not load your documents.'),
-          SizedBox(height: 4),
-          Text('Your local files were not modified.'),
+          const Icon(Icons.error_outline, size: 42),
+          const SizedBox(height: 12),
+          Text(l10n.couldNotLoadDocuments),
+          const SizedBox(height: 4),
+          Text(l10n.localFilesUnchanged),
         ],
       ),
     );
@@ -526,45 +475,35 @@ class _FilesErrorState extends StatelessWidget {
 
 enum _DocumentAction { share, rename, delete }
 
-String _labelForType(String type) {
+String _labelForType(BuildContext context, String type) {
+  final l10n = context.l10n;
   return switch (type) {
     'pdf' => 'PDF',
-    'image' => 'Image',
-    'text' => 'Text',
-    'spreadsheet' => 'Spreadsheet',
-    'presentation' => 'Presentation',
-    'document' => 'Document',
-    _ => 'File',
+    'image' => l10n.typeImage,
+    'text' => l10n.typeText,
+    'spreadsheet' => l10n.typeSpreadsheet,
+    'presentation' => l10n.typePresentation,
+    'document' => l10n.typeDocument,
+    _ => l10n.typeFile,
   };
 }
 
-String _formatUpdated(DateTime value) {
+String _formatUpdated(BuildContext context, DateTime value) {
   final DateTime now = DateTime.now();
   final DateTime date = DateTime(value.year, value.month, value.day);
   final DateTime today = DateTime(now.year, now.month, now.day);
   final int days = today.difference(date).inDays;
-
-  if (days == 0) {
-    return 'Today';
-  }
-  if (days == 1) {
-    return 'Yesterday';
-  }
-  return '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
+  if (days == 0) return context.l10n.today;
+  if (days == 1) return context.l10n.yesterday;
+  return DateFormat.yMd(context.l10n.localeName).format(value);
 }
 
 String _formatSize(int bytes) {
-  if (bytes < 1024) {
-    return '$bytes B';
-  }
+  if (bytes < 1024) return '$bytes B';
   final double kilobytes = bytes / 1024;
-  if (kilobytes < 1024) {
-    return '${kilobytes.toStringAsFixed(1)} KB';
-  }
+  if (kilobytes < 1024) return '${kilobytes.toStringAsFixed(1)} KB';
   final double megabytes = kilobytes / 1024;
-  if (megabytes < 1024) {
-    return '${megabytes.toStringAsFixed(1)} MB';
-  }
+  if (megabytes < 1024) return '${megabytes.toStringAsFixed(1)} MB';
   final double gigabytes = megabytes / 1024;
   return '${gigabytes.toStringAsFixed(1)} GB';
 }

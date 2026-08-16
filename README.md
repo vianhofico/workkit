@@ -1,253 +1,209 @@
 <div align="center">
+  <img src="assets/icon/workkit_icon.svg" width="140" alt="Biểu tượng WorkKit" />
 
-# 🧰 WorkKit
+# WorkKit
 
 ### Bộ công cụ tài liệu miễn phí cho công việc hằng ngày
 
 **Quét tài liệu · OCR · PDF · Chữ ký · QR · Xử lý ảnh · Sao lưu**
 
-WorkKit là ứng dụng di động tập trung nhiều công cụ xử lý tài liệu vào một nơi, ưu tiên **miễn phí**, **hoạt động cục bộ trên thiết bị** và **quyền riêng tư**.
+**Miễn phí trước tiên · Xử lý cục bộ · Ưu tiên quyền riêng tư**
 
-Không cần tạo tài khoản. Không cần backend để sử dụng các tính năng chính.
+[![TẢI WORKKIT - ANDROID APK](https://img.shields.io/badge/TẢI_WORKKIT-ANDROID_APK-5565FF?style=for-the-badge&logo=android&logoColor=white)](https://github.com/vianhofico/workkit/actions)
 
-[![Tải WorkKit cho Android](https://img.shields.io/badge/TẢI_WORKKIT-ANDROID_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/vianhofico/workkit/actions/workflows/ci.yml)
-
-**Phiên bản hiện tại: WorkKit 1.0.0**
-
+**Phiên bản: WorkKit 1.1.0 · Android hiện khả dụng · iOS-ready**
 </div>
 
 ---
 
 ## WorkKit là gì?
 
-WorkKit được xây dựng để thay thế nhiều ứng dụng nhỏ thường phải cài riêng như ứng dụng scan tài liệu, OCR, chỉnh sửa PDF, ký PDF, đọc QR hay nén ảnh.
+**WorkKit** là ứng dụng tiện ích tài liệu dành cho điện thoại, tập trung vào những thao tác thường xuyên trong học tập và công việc: quét giấy tờ, nhận dạng chữ, xử lý PDF, ký tài liệu, quét/tạo QR, xử lý ảnh và sao lưu dữ liệu.
 
-Thay vì phải chuyển tài liệu qua nhiều dịch vụ khác nhau, WorkKit cung cấp một bộ công cụ thống nhất ngay trên điện thoại.
+WorkKit được xây dựng theo nguyên tắc **local-first**: các công cụ cốt lõi chạy ngay trên thiết bị, không yêu cầu tạo tài khoản và không cần backend để sử dụng các tính năng chính.
 
-Phù hợp cho:
+### Phù hợp với
 
-- Sinh viên cần scan bài tập, giáo trình, tài liệu.
-- Nhân viên văn phòng thường xuyên làm việc với PDF và hình ảnh.
-- Người cần trích xuất chữ từ ảnh hoặc tài liệu.
-- Người muốn ký PDF nhanh trên điện thoại.
-- Người muốn xử lý tài liệu mà hạn chế đưa dữ liệu lên dịch vụ bên ngoài.
+- Sinh viên cần quét bài, OCR tài liệu và xử lý PDF nhanh.
+- Nhân viên văn phòng thường xuyên ký, gộp, tách hoặc chỉnh PDF.
+- Người dùng muốn một ứng dụng QR, ảnh và tài liệu gọn trong cùng một nơi.
+- Người ưu tiên quyền riêng tư và không muốn tải tài liệu cá nhân lên máy chủ không cần thiết.
 
 ---
 
-## ✨ Các chức năng chính
+## 🌐 Ngôn ngữ
+
+WorkKit hiện hỗ trợ đầy đủ giao diện:
+
+- 🇻🇳 **Tiếng Việt**
+- 🇬🇧 **English**
+- 🌐 **Theo ngôn ngữ hệ thống**
+
+Bạn có thể đổi ngôn ngữ ngay trong:
+
+**Cài đặt → Ngôn ngữ → Theo hệ thống / Tiếng Việt / English**
+
+Thay đổi có hiệu lực ngay và được lưu cục bộ trên thiết bị.
+
+> Ngôn ngữ giao diện và ngôn ngữ OCR là hai phần độc lập. OCR hiện sử dụng mô hình Latin của Google ML Kit và được tối ưu cho văn bản **tiếng Việt + tiếng Anh**.
+
+---
+
+## ✨ Chức năng chính
 
 ### 📷 Quét tài liệu
 
-Biến điện thoại thành máy scan tài liệu.
+- Quét giấy tờ trực tiếp bằng camera.
+- Nhận diện cạnh và cắt tài liệu trong giao diện scanner native.
+- Xoay và tăng cường hình ảnh.
+- Quét nhiều trang.
+- Lưu từng trang thành ảnh hoặc lưu chung thành PDF.
+- Tệp hoàn tất được đưa vào thư viện cục bộ của WorkKit.
 
-- Quét một hoặc nhiều trang.
-- Tự nhận diện vùng tài liệu.
-- Cắt và chỉnh phối cảnh.
-- Xoay trang.
-- Tăng cường chất lượng ảnh bằng công cụ native trên thiết bị.
-- Lưu kết quả thành ảnh hoặc PDF.
+### 🔍 OCR — Nhận dạng văn bản
 
-### 🔎 OCR — nhận dạng chữ trong ảnh và PDF
+- OCR ảnh đã nhập hoặc ảnh vừa quét.
+- OCR tài liệu PDF theo từng trang.
+- Nhận dạng tiếng Việt và tiếng Anh bằng ML Kit trên thiết bị.
+- Chỉnh sửa và lưu lại nội dung OCR.
+- Smart Extract tự phát hiện email, số điện thoại, URL, ngày và số tiền.
 
-Trích xuất nội dung văn bản từ tài liệu bằng OCR chạy trên thiết bị.
+### 📑 PDF Toolkit
 
-- OCR từ ảnh.
-- OCR tài liệu đã scan.
-- OCR PDF nhiều trang.
-- Hỗ trợ nội dung tiếng Việt và tiếng Anh theo mô hình Latin OCR.
-- Chỉnh sửa văn bản sau khi nhận dạng.
-- Sao chép nội dung nhanh.
-- Tự phát hiện một số dữ liệu hữu ích như số điện thoại, email, URL, ngày tháng và số tiền.
-
-### 📄 Bộ công cụ PDF
-
-Các thao tác PDF phổ biến được gom vào một nơi.
-
+- Ảnh → PDF.
 - Gộp nhiều PDF.
 - Tách PDF.
-- Trích xuất trang.
-- Sắp xếp lại thứ tự trang.
-- Xoay trang.
 - Xóa trang.
-- Chuyển ảnh thành PDF.
-- Chuyển PDF thành ảnh.
-- Làm việc với PDF có mật khẩu.
-- Xử lý file lớn theo hướng tiết kiệm bộ nhớ.
+- Sắp xếp lại trang.
+- Xoay trang.
+- PDF → ảnh.
+- Hỗ trợ PDF có mật khẩu ở các thao tác tương thích.
+- Luôn tạo bản sao mới thay vì ghi đè tệp gốc.
 
-WorkKit tạo file kết quả mới và không chủ động ghi đè lên tài liệu gốc.
+### ✍️ Chữ ký
 
-### ✍️ Chữ ký điện tử trên PDF
+- Vẽ chữ ký bằng tay ngay trên màn hình.
+- Lưu nhiều chữ ký cục bộ.
+- Chọn chữ ký và đặt lên PDF.
+- Chọn trang, vị trí, kích thước và góc xoay.
+- Xuất ra một bản PDF đã ký mới.
 
-- Vẽ chữ ký trực tiếp trên màn hình.
-- Lưu nhiều chữ ký trên thiết bị.
-- Chèn chữ ký vào PDF.
-- Điều chỉnh vị trí.
-- Thay đổi kích thước.
-- Xoay chữ ký.
-- Xuất thành một bản PDF mới đã ký.
-
-### 🔳 QR Code
+### 🔳 QR
 
 - Quét QR bằng camera.
-- Bật/tắt đèn pin khi quét.
-- Tạo QR Code từ nội dung văn bản.
-- Lưu lịch sử QR ngay trên thiết bị.
+- Tạo QR từ văn bản, URL hoặc dữ liệu ngắn bất kỳ.
+- Lưu lịch sử quét và QR đã tạo trên thiết bị.
+- Không cần gửi nội dung QR lên server.
 
-### 🖼️ Công cụ xử lý ảnh
+### 🖼 Xử lý ảnh
 
 - Nén ảnh.
-- Resize ảnh.
-- Crop ảnh.
+- Đổi kích thước.
+- Cắt ảnh theo tọa độ/kích thước.
 - Chuyển đổi JPG / PNG / WebP.
-- Xóa metadata khỏi ảnh.
-- Chạy các tác vụ xử lý nặng ngoài UI isolate để hạn chế làm đứng giao diện.
+- Xóa EXIF, metadata văn bản nhúng và ICC profile.
+- Giữ tệp gốc, tạo bản sao mới sau xử lý.
 
-### 📚 Thư viện tài liệu
+### 📁 Thư viện tài liệu
 
-WorkKit có thư viện riêng để quản lý các tài liệu đã nhập hoặc tạo ra.
-
-- Import file từ thiết bị.
-- Tìm kiếm tài liệu.
-- Xem tài liệu gần đây.
-- Đánh dấu yêu thích.
+- Nhập tệp từ thiết bị.
+- Tệp gần đây.
+- Tìm kiếm.
+- Yêu thích.
 - Đổi tên.
 - Xóa.
-- Chia sẻ / xuất file.
-- Xem dung lượng thư viện.
+- Chia sẻ / xuất tệp.
+- Xem nhanh dung lượng thư viện.
 
-### 💾 Sao lưu và khôi phục
+### 💾 Sao lưu & khôi phục
 
-- Tạo bản sao lưu dữ liệu WorkKit.
-- Khôi phục lại dữ liệu từ backup.
-- Phục hồi trạng thái khi một tác vụ dài bị gián đoạn do ứng dụng bị tắt.
-- Dọn file tạm bị bỏ lại.
-- Có cơ chế xử lý lỗi khi thiết bị gần hết dung lượng.
+- Tạo bản sao lưu cục bộ của dữ liệu WorkKit.
+- Sao lưu tài liệu, OCR, chữ ký, lịch sử QR và cài đặt.
+- Khôi phục dữ liệu từ bản sao lưu.
+- Tự dọn tệp tạm còn sót sau khi ứng dụng bị gián đoạn.
 
-> Bản backup hiện là file di động không mã hóa. Hãy lưu nó ở nơi an toàn nếu tài liệu của bạn có dữ liệu nhạy cảm.
-
----
-
-## 🔐 Quyền riêng tư
-
-WorkKit được thiết kế theo hướng **local-first**.
-
-Các tính năng chính như scan, OCR, xử lý PDF, chữ ký, QR và xử lý ảnh được thực hiện trên thiết bị. Ứng dụng không yêu cầu tài khoản để sử dụng các chức năng cốt lõi và không cần backend cho luồng sử dụng chính.
-
-Nguyên tắc của WorkKit:
-
-- Không chủ động tải tài liệu của bạn lên máy chủ WorkKit.
-- Không ghi đè file nguồn khi xử lý tài liệu.
-- Không cố ý ghi nội dung tài liệu hoặc mật khẩu PDF vào log.
-- Chữ ký được lưu cục bộ.
-- Lịch sử QR được lưu cục bộ.
+> Bản sao lưu hiện không được mã hóa. Hãy lưu nó ở vị trí an toàn.
 
 ---
 
-## 📱 Tải và cài đặt trên Android
+## 🔒 Quyền riêng tư
 
-### Tải APK mới nhất
+WorkKit được thiết kế với các nguyên tắc:
 
-[![Tải APK Android](https://img.shields.io/badge/TẢI_APK-MỚI_NHẤT-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/vianhofico/workkit/actions/workflows/ci.yml)
+- **Không bắt buộc tài khoản.**
+- **Không backend cho các tính năng cốt lõi.**
+- **Tệp ở trên thiết bị theo mặc định.**
+- **OCR chạy trên thiết bị.**
+- **QR được xử lý trên thiết bị.**
+- **Không tự ghi đè tài liệu gốc.**
+- Android tắt cloud backup tự động cho dữ liệu WorkKit và chặn cleartext traffic.
 
-Hiện tại APK được tạo tự động bởi GitHub Actions.
+---
 
-Cách tải:
+## ⬇️ Cài WorkKit trên Android
 
-1. Nhấn nút **Tải APK mới nhất** ở trên.
-2. Mở lần chạy `CI` thành công gần nhất của nhánh `main`.
+### Cách 1 — GitHub Actions
+
+1. Nhấn nút **TẢI WORKKIT – ANDROID APK** ở đầu README.
+2. Mở workflow **CI** mới nhất có trạng thái xanh.
 3. Kéo xuống phần **Artifacts**.
-4. Tải artifact có tên bắt đầu bằng `workkit-android-debug-`.
+4. Tải artifact có tên bắt đầu bằng `WorkKit-android-debug-`.
 5. Giải nén file ZIP.
-6. Mở file `app-debug.apk` trên điện thoại Android.
-7. Nếu Android yêu cầu, cho phép trình duyệt hoặc ứng dụng Files **cài ứng dụng không rõ nguồn gốc**.
-8. Chọn **Install / Cài đặt**.
+6. Mở `app-debug.apk` trên điện thoại Android và cài đặt.
 
-> Repository hiện có thể yêu cầu đăng nhập GitHub để tải artifact nếu đang để chế độ Private.
+Nếu Android chặn cài đặt, hãy cho phép **Install unknown apps / Cài ứng dụng không rõ nguồn gốc** cho trình duyệt hoặc ứng dụng quản lý tệp bạn đang dùng.
 
-### Lưu ý về bản cài hiện tại
-
-APK trong CI hiện là **debug build**, phù hợp để cài và kiểm thử các chức năng trực tiếp trên thiết bị. Bản phát hành qua Google Play sẽ sử dụng release AAB được ký bằng upload key riêng.
+> File `.aab` dùng cho Google Play Console và không phải file cài trực tiếp lên điện thoại.
 
 ---
 
-## 🍎 iOS
+## 🛠 Công nghệ
 
-Codebase đã được chuẩn bị để bootstrap project iOS và có các adapter dành cho những chức năng native tương ứng.
-
-Việc phát hành iOS chính thức vẫn cần kiểm thử trên iPhone/iPad thật, cấu hình signing của Apple và quy trình App Store/TestFlight.
+- Flutter / Dart
+- Riverpod
+- go_router
+- Drift + SQLite
+- Google ML Kit Text Recognition
+- ML Kit Document Scanner / VisionKit
+- pdf_manipulator
+- mobile_scanner
+- qr_flutter
+- package `image`
+- GitHub Actions
 
 ---
 
-## 🛠️ Dành cho developer
-
-WorkKit được xây dựng bằng Flutter với kiến trúc local-first.
-
-### Công nghệ chính
-
-- Flutter / Dart.
-- Riverpod — state management.
-- go_router — navigation.
-- Drift + SQLite — cơ sở dữ liệu local.
-- ML Kit / native document scanning và OCR.
-- Native/on-device PDF, QR và image processing.
-
-### Khởi tạo project Android/iOS
+## 🧑‍💻 Dành cho developer
 
 ```bash
-dart run tool/bootstrap_platforms.dart
 flutter pub get
+flutter gen-l10n
+dart run tool/bootstrap_platforms.dart
+dart run tool/generate_launcher_source.dart
+dart run flutter_launcher_icons
 dart run build_runner build
-```
-
-### Quality gate
-
-```bash
 flutter analyze
-flutter test --coverage
+flutter test
 flutter build apk --debug
-flutter build appbundle --release
 ```
 
-GitHub Actions tự động chạy analyzer, test, build Android APK và release AAB. Các build thành công được lưu dưới dạng workflow artifacts.
+Platform Android/iOS được bootstrap có kiểm soát để giữ các thiết lập privacy, release hardening, tên hiển thị **WorkKit** và launcher icon nhất quán. Launcher PNG được sinh deterministically từ source của repo trước khi tạo bộ icon Android/iOS.
+
+### Thêm ngôn ngữ mới
+
+Xem tài liệu trong `docs/localization/`. Kiến trúc hiện tại dùng Flutter `gen_l10n`, nên một locale mới chủ yếu cần ARB translation, khai báo locale và test tương ứng.
 
 ---
 
-## 🚀 Trạng thái dự án
+## Trạng thái dự án
 
-**WorkKit 1.0 đã hoàn thành phần implementation từ M0 đến M7.**
+WorkKit 1.1.0 đã hoàn thiện M0–M8 ở cấp source/CI, bao gồm nền tảng local-first, document library, scanner, OCR, PDF toolkit, signature, QR, image toolkit, production hardening, giao diện Việt/Anh và launcher icon chính thức.
 
-Các phần đã có trong repository:
-
-- ✅ Foundation & architecture.
-- ✅ Document Library.
-- ✅ Document Scanner.
-- ✅ OCR & Smart Extract.
-- ✅ PDF Toolkit.
-- ✅ Signature.
-- ✅ QR Tools.
-- ✅ Image Toolkit.
-- ✅ Backup / Restore.
-- ✅ Recovery & low-storage handling.
-- ✅ Accessibility / security / performance hardening.
-- ✅ Android CI build APK.
-- ✅ Android release AAB pipeline.
-
-Các bước còn phụ thuộc thiết bị hoặc tài khoản phát hành được theo dõi trong [`docs/project/external-validation.md`](docs/project/external-validation.md).
-
----
-
-## 💡 Triết lý của WorkKit
-
-> **Free first. Local first. Privacy first.**
-
-Mục tiêu của WorkKit là cung cấp những công cụ tài liệu thường dùng trong một ứng dụng đơn giản, hữu ích và không buộc người dùng phải đăng ký thuê bao chỉ để thực hiện các tác vụ cơ bản.
+Các bước phát hành store vẫn cần Android signing key, Play Console và physical-device validation trước khi đưa lên production.
 
 ---
 
 <div align="center">
-
-### WorkKit — Free Tools for Everyday Work
-
-**Scan. Convert. Extract. Sign. Organize. Work smarter.**
-
+  <strong>WorkKit — Scan. Convert. Extract. Sign. Organize.</strong><br/>
+  Làm việc thông minh hơn, ngay trên thiết bị của bạn.
 </div>

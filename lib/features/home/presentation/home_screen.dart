@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 
@@ -13,36 +14,34 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final AsyncValue<List<WorkDocument>> documents = ref.watch(documentsProvider);
+    final l10n = context.l10n;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
       children: <Widget>[
-        Text('WorkKit', style: textTheme.headlineMedium),
+        Text(l10n.appName, style: textTheme.headlineMedium),
         const SizedBox(height: 4),
-        Text(
-          'Everyday work tools. Private by default.',
-          style: textTheme.bodyMedium,
-        ),
+        Text(l10n.homeTagline, style: textTheme.bodyMedium),
         const SizedBox(height: 24),
         FilledButton.icon(
           onPressed: () => _importDocument(context, ref),
           icon: const Icon(Icons.file_open_outlined),
-          label: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 14),
-            child: Text('Import a file'),
+          label: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Text(l10n.importFile),
           ),
         ),
         const SizedBox(height: 28),
-        Text('Quick actions', style: textTheme.titleMedium),
+        Text(l10n.quickActions, style: textTheme.titleMedium),
         const SizedBox(height: 12),
         const _QuickActionGrid(),
         const SizedBox(height: 28),
         Row(
           children: <Widget>[
-            Expanded(child: Text('Recent', style: textTheme.titleMedium)),
+            Expanded(child: Text(l10n.recent, style: textTheme.titleMedium)),
             TextButton(
               onPressed: () => context.go('/files'),
-              child: const Text('View all'),
+              child: Text(l10n.viewAll),
             ),
           ],
         ),
@@ -75,16 +74,14 @@ class HomeScreen extends ConsumerWidget {
     try {
       final service = await ref.read(documentLibraryServiceProvider.future);
       final WorkDocument? document = await service.importFromDevice();
-      if (!context.mounted || document == null) {
-        return;
-      }
+      if (!context.mounted || document == null) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Imported ${document.name}')),
+        SnackBar(content: Text(context.l10n.importedDocument(document.name))),
       );
-    } catch (error) {
+    } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not import this file. $error')),
+          SnackBar(content: Text(context.l10n.importFailed)),
         );
       }
     }
@@ -96,13 +93,14 @@ class _QuickActionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const List<(IconData, String)> actions = <(IconData, String)>[
-      (Icons.document_scanner_outlined, 'Scan'),
-      (Icons.text_snippet_outlined, 'OCR'),
-      (Icons.picture_as_pdf_outlined, 'PDF'),
-      (Icons.qr_code_scanner_outlined, 'QR'),
-      (Icons.draw_outlined, 'Sign'),
-      (Icons.image_outlined, 'Image'),
+    final l10n = context.l10n;
+    final List<(IconData, String)> actions = <(IconData, String)>[
+      (Icons.document_scanner_outlined, l10n.scan),
+      (Icons.text_snippet_outlined, l10n.ocr),
+      (Icons.picture_as_pdf_outlined, l10n.pdf),
+      (Icons.qr_code_scanner_outlined, l10n.qr),
+      (Icons.draw_outlined, l10n.sign),
+      (Icons.image_outlined, l10n.image),
     ];
 
     return GridView.builder(
@@ -126,7 +124,7 @@ class _QuickActionGrid extends StatelessWidget {
               children: <Widget>[
                 Icon(icon),
                 const SizedBox(height: 8),
-                Text(label),
+                Text(label, textAlign: TextAlign.center),
               ],
             ),
           ),
@@ -161,11 +159,7 @@ class _RecentDocumentCard extends StatelessWidget {
                 ),
               )
             : const Icon(Icons.description_outlined),
-        title: Text(
-          document.name,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: Text(document.name, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(_formatSize(document.sizeBytes)),
         trailing: document.isFavorite ? const Icon(Icons.star, size: 20) : null,
         onTap: () => context.go('/files'),
@@ -188,7 +182,7 @@ class _EmptyRecentState extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                'Your recent imports and scans will appear here.',
+                context.l10n.recentEmpty,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
@@ -200,13 +194,9 @@ class _EmptyRecentState extends StatelessWidget {
 }
 
 String _formatSize(int bytes) {
-  if (bytes < 1024) {
-    return '$bytes B';
-  }
+  if (bytes < 1024) return '$bytes B';
   final double kilobytes = bytes / 1024;
-  if (kilobytes < 1024) {
-    return '${kilobytes.toStringAsFixed(1)} KB';
-  }
+  if (kilobytes < 1024) return '${kilobytes.toStringAsFixed(1)} KB';
   final double megabytes = kilobytes / 1024;
   return '${megabytes.toStringAsFixed(1)} MB';
 }

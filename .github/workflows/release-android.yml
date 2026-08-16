@@ -27,6 +27,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate localization
+        run: flutter gen-l10n
+
+      - name: Generate launcher source
+        run: dart run tool/generate_launcher_source.dart
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
       - name: Generate Drift code
         run: dart run build_runner build
 
@@ -69,7 +78,7 @@ jobs:
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: workkit-android-aab
+          name: WorkKit-android-aab
           path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14

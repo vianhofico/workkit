@@ -28,6 +28,7 @@ Future<void> main() async {
   await _patchIos();
   await _verifyAndroidPrivacyHardening();
   await _verifyAndroidReleaseHardening();
+  await _verifyProductIdentity();
   stdout.writeln('WorkKit Android/iOS platform bootstrap complete.');
 }
 
@@ -42,6 +43,10 @@ Future<void> _patchAndroid() async {
   final File manifest = File('android/app/src/main/AndroidManifest.xml');
   if (await manifest.exists()) {
     String content = await manifest.readAsString();
+    content = content.replaceFirst(
+      RegExp(r'android:label="[^"]*"'),
+      'android:label="WorkKit"',
+    );
     if (!content.contains('android:allowBackup=')) {
       content = content.replaceFirst(
         '<application',
@@ -52,8 +57,8 @@ Future<void> _patchAndroid() async {
             '        android:usesCleartextTraffic="false"\n'
             '        android:networkSecurityConfig="@xml/network_security_config"',
       );
-      await manifest.writeAsString(content);
     }
+    await manifest.writeAsString(content);
   }
 
   final Directory xml = Directory('android/app/src/main/res/xml');
@@ -172,6 +177,13 @@ Future<void> _patchIos() async {
   final File plist = File('ios/Runner/Info.plist');
   if (await plist.exists()) {
     String content = await plist.readAsString();
+    content = content.replaceFirst(
+      RegExp(
+        r'<key>CFBundleDisplayName</key>\s*<string>[^<]*</string>',
+        multiLine: true,
+      ),
+      '<key>CFBundleDisplayName</key>\n\t<string>WorkKit</string>',
+    );
     if (!content.contains('NSCameraUsageDescription')) {
       content = content.replaceFirst(
         '</dict>',
@@ -179,9 +191,33 @@ Future<void> _patchIos() async {
             '\t<string>WorkKit uses the camera only to scan documents and QR codes on this device.</string>\n'
             '</dict>',
       );
-      await plist.writeAsString(content);
     }
+    if (!content.contains('CFBundleLocalizations')) {
+      content = content.replaceFirst(
+        '</dict>',
+        '\t<key>CFBundleLocalizations</key>\n'
+            '\t<array>\n'
+            '\t\t<string>en</string>\n'
+            '\t\t<string>vi</string>\n'
+            '\t</array>\n'
+            '</dict>',
+      );
+    }
+    await plist.writeAsString(content);
   }
+
+  final Directory en = Directory('ios/Runner/en.lproj');
+  final Directory vi = Directory('ios/Runner/vi.lproj');
+  await en.create(recursive: true);
+  await vi.create(recursive: true);
+  await File('${en.path}${Platform.pathSeparator}InfoPlist.strings').writeAsString(
+    '"CFBundleDisplayName" = "WorkKit";\n'
+    '"NSCameraUsageDescription" = "WorkKit uses the camera to scan documents and QR codes on this device.";\n',
+  );
+  await File('${vi.path}${Platform.pathSeparator}InfoPlist.strings').writeAsString(
+    '"CFBundleDisplayName" = "WorkKit";\n'
+    '"NSCameraUsageDescription" = "WorkKit sử dụng camera để quét tài liệu và mã QR trên thiết bị này.";\n',
+  );
 }
 
 Future<void> _verifyAndroidPrivacyHardening() async {
@@ -235,5 +271,18 @@ Future<void> _verifyAndroidReleaseHardening() async {
     if (!rules.contains('-dontwarn $namespace')) {
       throw StateError('Android release R8 rule is missing: $namespace');
     }
+  }
+}
+
+Future<void> _verifyProductIdentity() async {
+  final String androidManifest =
+      await File('android/app/src/main/AndroidManifest.xml').readAsString();
+  if (!androidManifest.contains('android:label="WorkKit"')) {
+    throw StateError('Android display name must be WorkKit.');
+  }
+
+  final String iosPlist = await File('ios/Runner/Info.plist').readAsString();
+  if (!iosPlist.contains('<string>WorkKit</string>')) {
+    throw StateError('iOS display name must be WorkKit.');
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 
 class AppShell extends StatelessWidget {
   const AppShell({required this.child, super.key});
@@ -21,34 +22,35 @@ class AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(child: child),
       bottomNavigationBar: Semantics(
         container: true,
-        label: 'Primary navigation',
+        label: l10n.primaryNavigation,
         child: NavigationBar(
           selectedIndex: _currentIndex(context),
           onDestinationSelected: (int index) => context.go(_locations[index]),
-          destinations: const <NavigationDestination>[
+          destinations: <NavigationDestination>[
             NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Home',
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: l10n.home,
             ),
             NavigationDestination(
-              icon: Icon(Icons.folder_outlined),
-              selectedIcon: Icon(Icons.folder),
-              label: 'Files',
+              icon: const Icon(Icons.folder_outlined),
+              selectedIcon: const Icon(Icons.folder),
+              label: l10n.files,
             ),
             NavigationDestination(
-              icon: Icon(Icons.grid_view_outlined),
-              selectedIcon: Icon(Icons.grid_view),
-              label: 'Tools',
+              icon: const Icon(Icons.grid_view_outlined),
+              selectedIcon: const Icon(Icons.grid_view),
+              label: l10n.tools,
             ),
             NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings),
-              label: 'Settings',
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.settings,
             ),
           ],
         ),
