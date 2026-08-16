@@ -54,6 +54,14 @@ jobs:
       - name: Build Android debug APK
         run: flutter build apk --debug
 
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: workkit-android-debug-${{ github.sha }}
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+
   release-bundle:
     needs: quality
     runs-on: ubuntu-latest
@@ -80,3 +88,11 @@ jobs:
 
       - name: Build Android release AAB
         run: flutter build appbundle --release
+
+      - name: Upload unsigned release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: workkit-android-release-unsigned-${{ github.sha }}
+          path: build/app/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
