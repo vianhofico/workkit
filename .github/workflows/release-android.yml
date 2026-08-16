@@ -30,6 +30,9 @@ jobs:
       - name: Generate localization
         run: flutter gen-l10n
 
+      - name: Generate launcher source
+        run: dart run tool/generate_launcher_source.dart
+
       - name: Generate launcher icons
         run: dart run flutter_launcher_icons
 

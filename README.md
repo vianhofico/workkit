@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/icon/workkit_launcher.png" width="140" alt="Biểu tượng WorkKit" />
+  <img src="assets/icon/workkit_icon.svg" width="140" alt="Biểu tượng WorkKit" />
 
 # WorkKit
 
@@ -107,7 +107,7 @@ Thay đổi có hiệu lực ngay và được lưu cục bộ trên thiết b�
 ### 📁 Thư viện tài liệu
 
 - Nhập tệp từ thiết bị.
-- Recent files.
+- Tệp gần đây.
 - Tìm kiếm.
 - Yêu thích.
 - Đổi tên.
@@ -118,8 +118,8 @@ Thay đổi có hiệu lực ngay và được lưu cục bộ trên thiết b�
 ### 💾 Sao lưu & khôi phục
 
 - Tạo bản sao lưu cục bộ của dữ liệu WorkKit.
-- Sao lưu tài liệu, OCR, chữ ký, QR history và settings.
-- Khôi phục dữ liệu từ backup.
+- Sao lưu tài liệu, OCR, chữ ký, lịch sử QR và cài đặt.
+- Khôi phục dữ liệu từ bản sao lưu.
 - Tự dọn tệp tạm còn sót sau khi ứng dụng bị gián đoạn.
 
 > Bản sao lưu hiện không được mã hóa. Hãy lưu nó ở vị trí an toàn.
@@ -133,8 +133,8 @@ WorkKit được thiết kế với các nguyên tắc:
 - **Không bắt buộc tài khoản.**
 - **Không backend cho các tính năng cốt lõi.**
 - **Tệp ở trên thiết bị theo mặc định.**
-- **OCR chạy on-device.**
-- **QR được xử lý on-device.**
+- **OCR chạy trên thiết bị.**
+- **QR được xử lý trên thiết bị.**
 - **Không tự ghi đè tài liệu gốc.**
 - Android tắt cloud backup tự động cho dữ liệu WorkKit và chặn cleartext traffic.
 
@@ -179,6 +179,7 @@ Nếu Android chặn cài đặt, hãy cho phép **Install unknown apps / Cài �
 flutter pub get
 flutter gen-l10n
 dart run tool/bootstrap_platforms.dart
+dart run tool/generate_launcher_source.dart
 dart run flutter_launcher_icons
 dart run build_runner build
 flutter analyze
@@ -186,7 +187,7 @@ flutter test
 flutter build apk --debug
 ```
 
-Platform Android/iOS được bootstrap có kiểm soát để giữ các thiết lập privacy, release hardening, tên hiển thị **WorkKit** và launcher icon nhất quán.
+Platform Android/iOS được bootstrap có kiểm soát để giữ các thiết lập privacy, release hardening, tên hiển thị **WorkKit** và launcher icon nhất quán. Launcher PNG được sinh deterministically từ source của repo trước khi tạo bộ icon Android/iOS.
 
 ### Thêm ngôn ngữ mới
 
