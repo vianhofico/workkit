@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:signature/signature.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 import 'package:workkit/features/signature/application/signature_providers.dart';
@@ -19,7 +20,7 @@ class SignatureScreen extends ConsumerStatefulWidget {
 
 class _SignatureScreenState extends ConsumerState<SignatureScreen> {
   late final SignatureController _signatureController;
-  final TextEditingController _name = TextEditingController(text: 'My signature');
+  final TextEditingController _name = TextEditingController();
   final TextEditingController _page = TextEditingController(text: '1');
   final TextEditingController _x = TextEditingController(text: '50');
   final TextEditingController _y = TextEditingController(text: '50');
@@ -58,16 +59,17 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AsyncValue<List<WorkDocument>> documentsAsync = ref.watch(documentsProvider);
     final AsyncValue<List<SavedSignature>> signaturesAsync = ref.watch(signaturesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Signature')),
+      appBar: AppBar(title: Text(l10n.signature)),
       body: documentsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => const Center(child: Text('Unable to load documents.')),
+        error: (error, stack) => Center(child: Text(l10n.unableLoadDocuments)),
         data: (documents) => signaturesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => const Center(child: Text('Unable to load saved signatures.')),
+          error: (error, stack) => Center(child: Text(l10n.unableLoadSavedSignatures)),
           data: (signatures) => _content(documents, signatures),
         ),
       ),
@@ -75,6 +77,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
   }
 
   Widget _content(List<WorkDocument> documents, List<SavedSignature> signatures) {
+    final l10n = context.l10n;
     final List<WorkDocument> pdfs = documents.where((item) => item.type == 'pdf').toList();
     final WorkDocument? selectedDocument = _findDocument(pdfs, _selectedDocumentId);
     final SavedSignature? selectedSignature = _findSignature(signatures, _selectedSignatureId);
@@ -82,9 +85,9 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: <Widget>[
-        Text('Draw and save', style: Theme.of(context).textTheme.headlineSmall),
+        Text(l10n.drawAndSave, style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
-        const Text('Signatures stay on this device and are saved as transparent PNG files.'),
+        Text(l10n.signatureDescription),
         const SizedBox(height: 16),
         Container(
           height: 180,
@@ -93,40 +96,39 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           clipBehavior: Clip.antiAlias,
-          child: Signature(
-            controller: _signatureController,
-            backgroundColor: Colors.white,
-          ),
+          child: Signature(controller: _signatureController, backgroundColor: Colors.white),
         ),
         const SizedBox(height: 12),
         TextField(
           controller: _name,
-          decoration: const InputDecoration(
-            labelText: 'Signature name',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.signatureName,
+            hintText: l10n.mySignature,
+            border: const OutlineInputBorder(),
           ),
         ),
         const SizedBox(height: 12),
-        Row(
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
           children: <Widget>[
             OutlinedButton.icon(
               onPressed: _busy ? null : _signatureController.clear,
               icon: const Icon(Icons.clear),
-              label: const Text('Clear'),
+              label: Text(l10n.clear),
             ),
-            const SizedBox(width: 12),
             FilledButton.icon(
               onPressed: _busy ? null : _saveSignature,
               icon: const Icon(Icons.save_outlined),
-              label: const Text('Save signature'),
+              label: Text(l10n.saveSignature),
             ),
           ],
         ),
         const SizedBox(height: 28),
-        Text('Saved signatures', style: Theme.of(context).textTheme.titleLarge),
+        Text(l10n.savedSignatures, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
         if (signatures.isEmpty)
-          const Text('No saved signature yet.')
+          Text(l10n.noSavedSignature)
         else
           ...signatures.map(
             (signature) {
@@ -154,7 +156,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
                   ),
                 ),
                 trailing: IconButton(
-                  tooltip: 'Delete signature',
+                  tooltip: l10n.deleteSignature,
                   onPressed: _busy ? null : () => _deleteSignature(signature),
                   icon: const Icon(Icons.delete_outline),
                 ),
@@ -162,13 +164,13 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
             },
           ),
         const Divider(height: 40),
-        Text('Place on PDF', style: Theme.of(context).textTheme.headlineSmall),
+        Text(l10n.placeOnPdf, style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 8),
-        const Text('Coordinates and size use PDF points. Page numbers shown here start at 1.'),
+        Text(l10n.signaturePlacementDescription),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           initialValue: _selectedDocumentId,
-          decoration: const InputDecoration(labelText: 'PDF document', border: OutlineInputBorder()),
+          decoration: InputDecoration(labelText: l10n.pdfDocument, border: const OutlineInputBorder()),
           items: pdfs
               .map((item) => DropdownMenuItem<String>(value: item.id, child: Text(item.name)))
               .toList(),
@@ -181,33 +183,33 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
         ),
         if (pdfs.isEmpty) ...<Widget>[
           const SizedBox(height: 8),
-          const Text('Import or create a PDF first.'),
+          Text(l10n.importCreatePdfFirst),
         ],
         const SizedBox(height: 12),
         TextField(
           controller: _page,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Page', border: OutlineInputBorder()),
+          decoration: InputDecoration(labelText: l10n.page, border: const OutlineInputBorder()),
         ),
         const SizedBox(height: 12),
         TextField(
           controller: _password,
           obscureText: true,
-          decoration: const InputDecoration(
-            labelText: 'PDF password (only if protected)',
-            border: OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(labelText: l10n.pdfPassword, border: const OutlineInputBorder()),
         ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: _busy || selectedDocument == null ? null : () => _checkGeometry(selectedDocument),
           icon: const Icon(Icons.straighten),
-          label: const Text('Check page size'),
+          label: Text(l10n.checkPageSize),
         ),
         if (_geometry != null) ...<Widget>[
           const SizedBox(height: 8),
           Text(
-            'Page size: ${_geometry!.width.toStringAsFixed(0)} × ${_geometry!.height.toStringAsFixed(0)} pt',
+            l10n.pageSize(
+              _geometry!.width.toStringAsFixed(0),
+              _geometry!.height.toStringAsFixed(0),
+            ),
           ),
         ],
         const SizedBox(height: 16),
@@ -221,13 +223,13 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
         const SizedBox(height: 12),
         Row(
           children: <Widget>[
-            Expanded(child: _numberField(_width, 'Width')),
+            Expanded(child: _numberField(_width, l10n.width)),
             const SizedBox(width: 12),
-            Expanded(child: _numberField(_height, 'Height')),
+            Expanded(child: _numberField(_height, l10n.height)),
           ],
         ),
         const SizedBox(height: 16),
-        Text('Rotation: ${_rotation.round()}°'),
+        Text(l10n.rotation(_rotation.round())),
         Slider(
           value: _rotation,
           min: -180,
@@ -242,7 +244,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
               ? null
               : () => _signPdf(selectedDocument, selectedSignature),
           icon: const Icon(Icons.draw_outlined),
-          label: const Text('Create signed copy'),
+          label: Text(l10n.createSignedCopy),
         ),
         if (_busy) ...<Widget>[
           const SizedBox(height: 12),
@@ -281,21 +283,22 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
     try {
       final bytes = await _signatureController.toPngBytes(width: 800, height: 300);
       if (bytes == null || bytes.isEmpty) {
-        throw const FormatException('Draw a signature before saving.');
+        throw FormatException(context.l10n.drawSignatureBeforeSaving);
       }
       final SignatureService service = await ref.read(signatureServiceProvider.future);
-      final SavedSignature saved = await service.saveSignature(_name.text, bytes);
+      final String name = _name.text.trim().isEmpty ? context.l10n.mySignature : _name.text.trim();
+      final SavedSignature saved = await service.saveSignature(name, bytes);
       _signatureController.clear();
       if (mounted) {
         setState(() => _selectedSignatureId = saved.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Signature saved locally.')),
+          SnackBar(content: Text(context.l10n.signatureSaved)),
         );
       }
     } on FormatException catch (error) {
       _show(error.message);
     } catch (_) {
-      _show('Unable to save signature.');
+      _show(context.l10n.signatureSaveFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -310,7 +313,7 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
         setState(() => _selectedSignatureId = null);
       }
     } catch (_) {
-      _show('Unable to delete signature.');
+      _show(context.l10n.signatureDeleteFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -328,11 +331,11 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
       );
       if (mounted) setState(() => _geometry = geometry);
     } on SignaturePdfException catch (error) {
-      _show(error.message);
+      _show(error.passwordRequired ? context.l10n.pdfPasswordRequired : context.l10n.pdfInspectFailed);
     } on FormatException catch (error) {
       _show(error.message);
     } catch (_) {
-      _show('Unable to inspect the PDF page.');
+      _show(context.l10n.pdfInspectFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -345,8 +348,8 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
         page: _pageIndex(),
         x: _double(_x, 'X'),
         y: _double(_y, 'Y'),
-        width: _double(_width, 'Width'),
-        height: _double(_height, 'Height'),
+        width: _double(_width, context.l10n.width),
+        height: _double(_height, context.l10n.height),
         rotationDegrees: _rotation,
       );
       final SignatureService service = await ref.read(signatureServiceProvider.future);
@@ -358,15 +361,15 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Saved ${output.name} to WorkKit.')),
+          SnackBar(content: Text(context.l10n.savedNamedToWorkKit(output.name))),
         );
       }
     } on SignaturePdfException catch (error) {
-      _show(error.message);
+      _show(error.passwordRequired ? context.l10n.pdfPasswordRequired : context.l10n.signedPdfFailed);
     } on FormatException catch (error) {
       _show(error.message);
     } catch (_) {
-      _show('Unable to create signed PDF.');
+      _show(context.l10n.signedPdfFailed);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -375,16 +378,14 @@ class _SignatureScreenState extends ConsumerState<SignatureScreen> {
   int _pageIndex() {
     final int? value = int.tryParse(_page.text.trim());
     if (value == null || value < 1) {
-      throw const FormatException('Page must be 1 or greater.');
+      throw FormatException(context.l10n.pageMustBeOne);
     }
     return value - 1;
   }
 
   double _double(TextEditingController controller, String field) {
     final double? value = double.tryParse(controller.text.trim());
-    if (value == null) {
-      throw FormatException('$field must be a number.');
-    }
+    if (value == null) throw FormatException(context.l10n.mustBeNumber(field));
     return value;
   }
 

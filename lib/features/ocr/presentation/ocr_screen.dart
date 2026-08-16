@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workkit/core/errors/app_failure.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 import 'package:workkit/features/documents/application/document_providers.dart';
 import 'package:workkit/features/documents/domain/work_document.dart';
 import 'package:workkit/features/ocr/application/ocr_providers.dart';
@@ -28,14 +29,13 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AsyncValue<List<WorkDocument>> documents = ref.watch(documentsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('OCR')),
+      appBar: AppBar(title: Text(l10n.ocr)),
       body: documents.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => const Center(
-          child: Text('Unable to load the document library.'),
-        ),
+        error: (error, stackTrace) => Center(child: Text(l10n.unableLoadLibrary)),
         data: (items) {
           final List<WorkDocument> supported = items
               .where((document) => document.type == 'image' || document.type == 'pdf')
@@ -43,21 +43,19 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
           return ListView(
             padding: const EdgeInsets.all(20),
             children: <Widget>[
-              Text('On-device text recognition', style: Theme.of(context).textTheme.headlineSmall),
+              Text(l10n.onDeviceTextRecognition, style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 8),
-              const Text(
-                'Choose an image or PDF from WorkKit. PDF pages are rendered locally, then recognized with the Latin ML Kit model for Vietnamese and English text.',
-              ),
+              Text(l10n.ocrDescription),
               const SizedBox(height: 20),
               if (supported.isEmpty)
-                const Card(
+                Card(
                   child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('Import or scan an image/PDF first, then return here.'),
+                    padding: const EdgeInsets.all(16),
+                    child: Text(l10n.importImagePdfFirst),
                   ),
                 )
               else ...<Widget>[
-                Text('Document', style: Theme.of(context).textTheme.titleMedium),
+                Text(l10n.documentSection, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -74,11 +72,9 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
                 ),
                 const SizedBox(height: 16),
                 FilledButton.icon(
-                  onPressed: _selectedId == null || _busy
-                      ? null
-                      : () => _extract(supported),
+                  onPressed: _selectedId == null || _busy ? null : () => _extract(supported),
                   icon: const Icon(Icons.text_snippet_outlined),
-                  label: const Text('Extract text'),
+                  label: Text(l10n.extractText),
                 ),
               ],
               if (_busy) ...<Widget>[
@@ -91,10 +87,10 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
                   controller: _controller,
                   minLines: 10,
                   maxLines: 20,
-                  decoration: const InputDecoration(
-                    labelText: 'Extracted text',
+                  decoration: InputDecoration(
+                    labelText: l10n.extractedText,
                     alignLabelWithHint: true,
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
@@ -102,7 +98,7 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
                 OutlinedButton.icon(
                   onPressed: _selectedId == null || _busy ? null : _saveEdited,
                   icon: const Icon(Icons.save_outlined),
-                  label: const Text('Save edited text'),
+                  label: Text(l10n.saveEditedText),
                 ),
                 const SizedBox(height: 20),
                 _EntitySection(entities: _entities),
@@ -120,14 +116,9 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
       _controller.clear();
       _entities = const SmartEntities();
     });
-    if (document == null) {
-      return;
-    }
-    final OcrDocumentResult? saved =
-        await ref.read(ocrServiceProvider).load(document.id);
-    if (!mounted || _selectedId != document.id || saved == null) {
-      return;
-    }
+    if (document == null) return;
+    final OcrDocumentResult? saved = await ref.read(ocrServiceProvider).load(document.id);
+    if (!mounted || _selectedId != document.id || saved == null) return;
     setState(() {
       _controller.text = saved.text;
       _entities = saved.entities;
@@ -136,9 +127,7 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
 
   Future<void> _extract(List<WorkDocument> documents) async {
     final String? id = _selectedId;
-    if (id == null) {
-      return;
-    }
+    if (id == null) return;
     WorkDocument? selected;
     for (final WorkDocument document in documents) {
       if (document.id == id) {
@@ -146,14 +135,11 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
         break;
       }
     }
-    if (selected == null) {
-      return;
-    }
+    if (selected == null) return;
 
     setState(() => _busy = true);
     try {
-      final OcrDocumentResult result =
-          await ref.read(ocrServiceProvider).extract(selected);
+      final OcrDocumentResult result = await ref.read(ocrServiceProvider).extract(selected);
       if (mounted) {
         setState(() {
           _controller.text = result.text;
@@ -163,33 +149,29 @@ class _OcrScreenState extends ConsumerState<OcrScreen> {
     } on AppFailure catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message)),
+          SnackBar(content: Text(context.localizedFailure(error))),
         );
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to extract text.')),
+          SnackBar(content: Text(context.l10n.unableExtractText)),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() => _busy = false);
-      }
+      if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _saveEdited() async {
     final String? id = _selectedId;
-    if (id == null) {
-      return;
-    }
+    if (id == null) return;
     final OcrDocumentResult result =
         await ref.read(ocrServiceProvider).saveEdited(id, _controller.text);
     if (mounted) {
       setState(() => _entities = result.entities);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OCR text saved locally.')),
+        SnackBar(content: Text(context.l10n.ocrSaved)),
       );
     }
   }
@@ -202,27 +184,24 @@ class _EntitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (entities.isEmpty) {
-      return const Text('No phone, email, date, URL, or money values detected yet.');
-    }
+    final l10n = context.l10n;
+    if (entities.isEmpty) return Text(l10n.noSmartEntities);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Smart extraction', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.smartExtraction, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        _chips('Email', entities.emails),
-        _chips('Phone', entities.phones),
-        _chips('Date', entities.dates),
-        _chips('URL', entities.urls),
-        _chips('Money', entities.money),
+        _chips(l10n.email, entities.emails),
+        _chips(l10n.phone, entities.phones),
+        _chips(l10n.date, entities.dates),
+        _chips(l10n.url, entities.urls),
+        _chips(l10n.money, entities.money),
       ],
     );
   }
 
   Widget _chips(String label, List<String> values) {
-    if (values.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (values.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(

@@ -2,31 +2,32 @@
 
 ## Current state
 
-WorkKit 1.0 code complete; external device/store validation pending.
+WorkKit 1.1.0 source is code-complete through M8 once the M8 branch passes CI and is merged. External physical-device/store validation remains separate because it cannot be truthfully completed by repository CI alone.
 
 ## Completed in repository
 
 - M0 Foundation
 - M1 Document Library
-- M2 Native Scanner implementation + reproducible Android/iOS bootstrap
+- M2 Native Scanner + reproducible Android/iOS bootstrap
 - M3 On-device OCR + smart extraction
 - M4 Streaming PDF Toolkit
 - M5 Local signatures + QR tools
 - M6 Local Image Toolkit
 - M7 recovery, backup/restore, accessibility, privacy/security, performance and Android release hardening
+- M8 Vietnamese/English localization, locale persistence and official WorkKit product identity/icon
 
-## M7 production hardening
+## M8 localization and identity
 
-- Long-running OCR/PDF/image/signature operations are journaled as running/completed/failed and stale running jobs become interrupted after restart.
-- Startup/manual storage recovery removes WorkKit-owned abandoned temporary outputs.
-- Low-storage file-system failures are surfaced with an actionable recovery message.
-- Backup/restore streams managed files and restores metadata/files from a validated staged bundle.
-- Settings exposes create/share backup, restore confirmation and storage recovery.
-- Accessibility and performance regression tests run in CI.
-- Privacy/security and physical performance reviews are documented.
-- Standard CI validates analyzer, tests, Android debug APK and release AAB.
-- A separate workflow builds a signed release AAB when repository signing secrets are configured.
+- Product-facing name is `WorkKit`; the lowercase `workkit` identifier remains only where Dart/package/tooling rules require lowercase identifiers.
+- UI supports English, Vietnamese and system-default locale selection.
+- Locale preference is stored locally in the existing Drift `AppSettings` table and updates the app without restart.
+- User-facing strings across navigation, Home, Files, Tools, Settings, Scanner, OCR, PDF, Signature, QR and Image Toolkit are localized.
+- Dates, counts, dialogs, snackbars, tooltips and semantics participate in localization.
+- OCR remains independent from UI locale and continues to use the on-device Latin recognition model optimized for Vietnamese and English text.
+- The official WorkKit launcher icon is generated for Android/iOS during CI/release bootstrap.
+- Android/iOS product display names are explicitly normalized to `WorkKit`.
+- CI generates localization source and launcher icons before analyzer/tests/builds.
 
 ## External validation remaining
 
-Real hardware and Play Console checks are intentionally tracked in `docs/project/external-validation.md`. These cannot be truthfully completed by repository CI alone.
+Physical hardware and Play Console checks remain tracked in `docs/project/external-validation.md`.

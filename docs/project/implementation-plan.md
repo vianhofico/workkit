@@ -14,6 +14,8 @@ Status: Code complete; physical validation pending
 - [x] Reproducible Android/iOS generation
 - [x] iOS deployment target and camera permission
 - [x] Android debug APK build in CI
+- [x] Product display name normalized to `WorkKit`
+- [x] WorkKit launcher icon generation for Android/iOS
 - [ ] Physical Android smoke test — external validation
 
 ## M2 — Scanner
@@ -68,4 +70,22 @@ Status: Code complete; external release validation pending
 - [x] Android release AAB build and signed-AAB workflow
 - [ ] Play Store internal testing — external Play Console validation
 
-See `docs/project/external-validation.md` for the remaining hardware/account-bound checks.
+## M8 — Localization and Product Identity
+Status: Complete when M8 CI is green and merged
+- [x] Flutter `gen_l10n` infrastructure
+- [x] English and Vietnamese ARB catalogs with key parity
+- [x] System / Vietnamese / English locale preference
+- [x] Locale persistence in existing Drift `AppSettings`
+- [x] Instant language switching without app restart
+- [x] Home, Files, Tools and Settings localization
+- [x] Scanner, OCR, PDF, Signature, QR and Image Toolkit localization
+- [x] Dialogs, snackbars, tooltips and accessibility semantics localization
+- [x] Locale-aware dates and pluralized user-facing counts
+- [x] English/Vietnamese/unsupported-locale tests
+- [x] 200% text-scale regression tests for English and Vietnamese
+- [x] Official WorkKit launcher icon wired into Android/iOS build
+- [x] Android/iOS display name normalized to `WorkKit`
+- [x] Localization documentation
+- [x] README updated for WorkKit 1.1.0
+
+See `docs/project/external-validation.md` for remaining hardware/account-bound checks.

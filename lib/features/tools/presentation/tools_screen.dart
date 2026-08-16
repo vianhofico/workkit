@@ -1,44 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:workkit/core/localization/localization_extensions.dart';
 
 class ToolsScreen extends StatelessWidget {
   const ToolsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const List<_ToolSection> sections = <_ToolSection>[
+    final l10n = context.l10n;
+    final List<_ToolSection> sections = <_ToolSection>[
       _ToolSection(
-        title: 'Document',
+        title: l10n.documentSection,
         tools: <_ToolItem>[
-          _ToolItem('Scan document', Icons.document_scanner_outlined, '/tools/scanner'),
-          _ToolItem('OCR', Icons.text_snippet_outlined, '/tools/ocr'),
-          _ToolItem('Image to PDF', Icons.picture_as_pdf_outlined, '/tools/pdf'),
+          _ToolItem(l10n.scanDocument, Icons.document_scanner_outlined, '/tools/scanner'),
+          _ToolItem(l10n.ocr, Icons.text_snippet_outlined, '/tools/ocr'),
+          _ToolItem(l10n.imageToPdf, Icons.picture_as_pdf_outlined, '/tools/pdf'),
         ],
       ),
       _ToolSection(
-        title: 'PDF',
+        title: l10n.pdf,
         tools: <_ToolItem>[
-          _ToolItem('Merge / split', Icons.merge_type, '/tools/pdf'),
-          _ToolItem('Reorder / delete', Icons.reorder, '/tools/pdf'),
-          _ToolItem('Rotate / export images', Icons.rotate_right, '/tools/pdf'),
-          _ToolItem('Sign', Icons.draw_outlined, '/tools/signature'),
+          _ToolItem(l10n.mergeSplit, Icons.merge_type, '/tools/pdf'),
+          _ToolItem(l10n.reorderDelete, Icons.reorder, '/tools/pdf'),
+          _ToolItem(l10n.rotateExportImages, Icons.rotate_right, '/tools/pdf'),
+          _ToolItem(l10n.sign, Icons.draw_outlined, '/tools/signature'),
         ],
       ),
       _ToolSection(
-        title: 'Image',
+        title: l10n.image,
         tools: <_ToolItem>[
-          _ToolItem('Compress', Icons.compress, '/tools/image'),
-          _ToolItem('Resize', Icons.aspect_ratio, '/tools/image'),
-          _ToolItem('Crop', Icons.crop, '/tools/image'),
-          _ToolItem('Convert', Icons.transform, '/tools/image'),
-          _ToolItem('Remove metadata', Icons.privacy_tip_outlined, '/tools/image'),
+          _ToolItem(l10n.compress, Icons.compress, '/tools/image'),
+          _ToolItem(l10n.resize, Icons.aspect_ratio, '/tools/image'),
+          _ToolItem(l10n.crop, Icons.crop, '/tools/image'),
+          _ToolItem(l10n.convert, Icons.transform, '/tools/image'),
+          _ToolItem(l10n.removeMetadata, Icons.privacy_tip_outlined, '/tools/image'),
         ],
       ),
       _ToolSection(
-        title: 'QR',
+        title: l10n.qr,
         tools: <_ToolItem>[
-          _ToolItem('Scan QR', Icons.qr_code_scanner, '/tools/qr'),
-          _ToolItem('Create QR', Icons.qr_code_2, '/tools/qr'),
+          _ToolItem(l10n.scanQr, Icons.qr_code_scanner, '/tools/qr'),
+          _ToolItem(l10n.createQr, Icons.qr_code_2, '/tools/qr'),
         ],
       ),
     ];
@@ -46,9 +48,9 @@ class ToolsScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: <Widget>[
-        Text('Tools', style: Theme.of(context).textTheme.headlineMedium),
+        Text(l10n.tools, style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 16),
-        const SearchBar(leading: Icon(Icons.search), hintText: 'Search tools'),
+        SearchBar(leading: const Icon(Icons.search), hintText: l10n.searchTools),
         const SizedBox(height: 24),
         ...sections.map(
           (_ToolSection section) => Padding(
@@ -64,7 +66,7 @@ class ToolsScreen extends StatelessWidget {
                     leading: Icon(tool.icon),
                     title: Text(tool.label),
                     trailing: tool.route == null
-                        ? const Chip(label: Text('Coming soon'))
+                        ? Chip(label: Text(l10n.comingSoon))
                         : const Icon(Icons.chevron_right),
                     onTap: tool.route == null ? null : () => context.push(tool.route!),
                   ),

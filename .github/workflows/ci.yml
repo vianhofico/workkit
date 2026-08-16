@@ -39,6 +39,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate localization
+        run: flutter gen-l10n
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
       - name: Generate Drift code
         run: dart run build_runner build
 
@@ -57,7 +63,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: workkit-android-debug-${{ github.sha }}
+          name: WorkKit-android-debug-${{ github.sha }}
           path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
           retention-days: 7
@@ -83,6 +89,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate localization
+        run: flutter gen-l10n
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
       - name: Generate Drift code
         run: dart run build_runner build
 
@@ -92,7 +104,7 @@ jobs:
       - name: Upload unsigned release AAB
         uses: actions/upload-artifact@v4
         with:
-          name: workkit-android-release-unsigned-${{ github.sha }}
+          name: WorkKit-android-release-unsigned-${{ github.sha }}
           path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
