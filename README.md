@@ -9,7 +9,7 @@
 
 **Miễn phí trước tiên · Xử lý cục bộ · Ưu tiên quyền riêng tư**
 
-[![TẢI WORKKIT - ANDROID APK](https://img.shields.io/badge/TẢI_WORKKIT-ANDROID_APK-5565FF?style=for-the-badge&logo=android&logoColor=white)](https://github.com/vianhofico/workkit/actions)
+[![TẢI WORKKIT - ANDROID APK](https://img.shields.io/badge/TẢI_WORKKIT-ANDROID_APK-5565FF?style=for-the-badge&logo=android&logoColor=white)](https://github.com/vianhofico/workkit/releases/download/v1.1.0/WorkKit-v1.1.0-android.apk)
 
 **Phiên bản: WorkKit 1.1.0 · Android hiện khả dụng · iOS-ready**
 </div>
@@ -142,16 +142,16 @@ WorkKit được thiết kế với các nguyên tắc:
 
 ## ⬇️ Cài WorkKit trên Android
 
-### Cách 1 — GitHub Actions
+### Tải trực tiếp từ GitHub Release
 
 1. Nhấn nút **TẢI WORKKIT – ANDROID APK** ở đầu README.
-2. Mở workflow **CI** mới nhất có trạng thái xanh.
-3. Kéo xuống phần **Artifacts**.
-4. Tải artifact có tên bắt đầu bằng `WorkKit-android-debug-`.
-5. Giải nén file ZIP.
-6. Mở `app-debug.apk` trên điện thoại Android và cài đặt.
+2. Điện thoại sẽ tải trực tiếp file `WorkKit-v1.1.0-android.apk` từ GitHub Release.
+3. Mở file APK vừa tải xuống.
+4. Chọn **Cài đặt / Install**.
 
 Nếu Android chặn cài đặt, hãy cho phép **Install unknown apps / Cài ứng dụng không rõ nguồn gốc** cho trình duyệt hoặc ứng dụng quản lý tệp bạn đang dùng.
+
+Bạn cũng có thể mở trang **Releases** của repository và chọn **WorkKit v1.1.0 → Assets → WorkKit-v1.1.0-android.apk**.
 
 > File `.aab` dùng cho Google Play Console và không phải file cài trực tiếp lên điện thoại.
 
