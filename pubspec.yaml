@@ -40,10 +40,11 @@ flutter:
   generate: true
   assets:
     - assets/icon/workkit_launcher.png
+    - assets/icon/workkit_launcher.jpg
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/icon/workkit_launcher.png
+  image_path: assets/icon/workkit_launcher.jpg
   min_sdk_android: 21
   remove_alpha_ios: true
